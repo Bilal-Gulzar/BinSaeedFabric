@@ -74,7 +74,7 @@ const response =
                     alt={`${item.title}`}
                     width={500}
                     height={500}
-                    className="w-full max-h-full mx-auto my-auto object-cover"
+                    className="img-slider-img"
                     onError={(e) => {
                       console.error(
                         "Image failed to load for product:",

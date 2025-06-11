@@ -347,7 +347,7 @@ const handleBuyAgain = async (orderId: string,items:Item[]) => {
                         </p>
                         <p className="text-gray-500 mt-1">
                           <span className="font-semibold text-black">
-                            Order:
+                            OrderID:
                           </span>
                           <span className="text-xs font-medium"> {v._id}</span>
                         </p>

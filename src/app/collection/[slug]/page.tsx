@@ -59,7 +59,7 @@ export default function ProductPage() {
           _id,
           isNew,
           qty,
-          originalPrice
+          originalPrice,
           sizes[],
           description, 
           "imageUrl": thumbnail.asset -> url,

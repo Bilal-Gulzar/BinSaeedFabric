@@ -16,7 +16,9 @@ export default async function OrderID() {
     <form
           action={async () => {
             "use server";
-            await signIn("google");
+            await signIn("google", {
+              callbackUrl: "/orderID",
+            });
           }}
         >
           <Button type="submit" className="!px-10 rounded-md !py-2 ">

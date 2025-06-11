@@ -246,7 +246,7 @@ const handleBuyAgain = async () => {
                       </span>
                     </Link>
                     <h1 className="font-semibold text-xl break-all">
-                      Order: {order?._id}
+                      OrderID: {order?._id}
                     </h1>
                   </div>
                   <div className="ml-8 text-gray-500 font-medium text-sm tracking-wide">
