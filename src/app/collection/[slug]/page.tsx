@@ -380,7 +380,7 @@ export default function ProductPage() {
                 <button
                   disabled={product.qty == 0}
                   onClick={handleAddToCart}
-                  className="bg-black py-2.5 px-4 grow disabled:bg-black/50 disabled:hover:text-white text-sm sm:w-auto text-white font-semibold hover:bg-white hover:text-black hover:border-gray-400 hover:border border border-transparent flex items-center gap-2 justify-center"
+                  className="bg-black py-2.5 px-4 grow cursor-pointer disabled:bg-black/50 disabled:hover:text-white text-sm sm:w-auto text-white font-semibold hover:bg-white hover:text-black hover:border-gray-400 hover:border border border-transparent flex items-center gap-2 justify-center"
                 >
                   <svg
                     width="16"

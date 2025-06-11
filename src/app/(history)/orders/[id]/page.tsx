@@ -506,7 +506,7 @@ const handleBuyAgain = async () => {
                           </div>
                         )}
                         {order?.isPaid &&
-                          order.paymentStatus == "delivered" && (
+                          order.paymentStatus == "Delivered" && (
                             <div className=" flex flex-col gap-2">
                               <div className="font-semibold text-sm text-gray-600">
                                 {" "}

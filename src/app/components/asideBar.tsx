@@ -151,7 +151,7 @@ export default function AsideBar({
       </section>
 
       <section
-        className={`min-h-screen transition-all duration-500 overflow-x-hidden border-t border-gray-500 bg-white fixed px-3 left-0 top-[90px] bottom-0 z-30  w-[80vw] md:hidden ${
+        className={`height transition-all duration-500 overflow-x-hidden border-t border-gray-500 bg-white fixed px-3 left-0 top-[90px] bottom-0 z-30  w-[80vw] md:hidden ${
           showdiv ? "" : "-translate-x-full"
         }  `}
         ref={modalRef}
@@ -221,21 +221,33 @@ export default function AsideBar({
           <div className="flex items-center pl-3 text-sm   py-4 ">Shop</div>
         </Link>
         <Link href="/orders">
-          <div className={`flex items-center pl-3 text-sm   py-4 
-            ${path.includes('/orders') ? "underline" : "no-underline"}
-            `}>Orders</div>
+          <div
+            className={`flex items-center pl-3 text-sm   py-4 
+            ${path.includes("/orders") ? "underline" : "no-underline"}
+            `}
+          >
+            Orders
+          </div>
         </Link>
 
         <div className="flex  absolute bottom-24 border-t w-full border-r-gray-300 flex-col text-sm text gap-3 py-5   ">
           <Link href="/profile">
-            <p className={`hover:bg-[#f5f5f5] p-2.5
-               ${path.includes('/profile') ? "underline" : "no-underline"}
-             `}>Profile</p>
+            <p
+              className={`hover:bg-[#f5f5f5] p-2.5
+               ${path.includes("/profile") ? "underline" : "no-underline"}
+             `}
+            >
+              Profile
+            </p>
           </Link>
           <Link href="/logout">
-            <p className={`hover:bg-[#f5f5f5] p-2.5
-               ${path.includes('/logout') ? "underline" : "no-underline"}
-              `}>Settings</p>
+            <p
+              className={`hover:bg-[#f5f5f5] p-2.5
+               ${path.includes("/logout") ? "underline" : "no-underline"}
+              `}
+            >
+              Settings
+            </p>
           </Link>
           <p onClick={handleLogout} className="hover:bg-[#f5f5f5] p-2.5">
             Log out

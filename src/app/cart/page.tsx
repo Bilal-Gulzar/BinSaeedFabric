@@ -77,11 +77,11 @@ export default function CartPage() {
     evt.preventDefault();
     try {
       setIsLoading(true);
-      // const data = await validatePhone(form.phone);
-      //  if (!data.phone_valid || data.country_code !== "PK") {
-      //   toast.error("Invalid or non-Pakistani number");
-      //   return
-      // }
+      const data = await validatePhone(form.phone);
+       if (!data.phone_valid || data.country_code !== "PK") {
+        toast.error("Invalid or non-Pakistani number");
+        return
+      }
       let subtotal = getTotalPrice();
       const checkoutdata = {
         ...form,
@@ -218,7 +218,7 @@ export default function CartPage() {
                     </div>
                     <div className="font-medium md:hidden text-sm py-5 flex-col lg:gap-0 md:gap-2 lg:flex-row  justify-between">
                       <div className="flex gap-4 items-center">
-                        <div className="font-bold gap-4 w-24 sm:w-28 justify-between px-1 py-3 flex border border-gray-300 items-center">
+                        <div className="font-bold xs:gap-4 w-24 xs:w-28 justify-between px-1 py-3 flex border border-gray-300 items-center">
                           <span
                             className="cursor-pointer text-gray-700 hover:text-black"
                             onClick={() =>
@@ -268,7 +268,7 @@ export default function CartPage() {
                     Rs.{item.price.toLocaleString()}
                   </div>
                   <div className="">
-                    <div className="font-bold gap-4 w-28 justify-between px-1 py-3 flex border border-gray-300 items-center">
+                    <div className="font-bold gap-4 w-28 justify-between px-1  py-3 flex border border-gray-300 items-center">
                       <span
                         className="cursor-pointer text-gray-700 hover:text-black"
                         onClick={() =>
@@ -286,7 +286,7 @@ export default function CartPage() {
                         {item.quantity}
                       </span>
                       <span
-                        className="cursor-pointer text-gray-500 hover:text-black"
+                        className="cursor-pointer  text-gray-500 hover:text-black"
                         onClick={() =>
                           handleQuantityChange(
                             item.id,
@@ -363,7 +363,7 @@ export default function CartPage() {
                     Rs.{cartItems.length > 0 ? shippingFee : 0}
                   </span>
                 </div>
-                <div className="font-bold flex items-center mt-9  mb-12 pb-0 md:pb-3 border-b border-gray-200 justify-between">
+                <div className="font-bold flex items-center mt-9  mb-12  pb-3 border-b border-gray-200 justify-between">
                   TOTAL
                   <span className="text-base">
                     Rs.

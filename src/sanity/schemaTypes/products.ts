@@ -55,7 +55,7 @@ export const product = defineType({
     defineField({
       name: "price",
       type: "number",
-      title: "Price",
+      title: "Current Price",
       validation: (rule) => rule.required(),
     }),
     defineField({
@@ -77,9 +77,9 @@ export const product = defineType({
       initialValue: [],
     }),
     defineField({
-      name: "discountPercentage",
+      name: "originalPrice",
       type: "number",
-      title: "Discount Percentage",
+      title: "Original Price",
       initialValue: 0,
     }),
     defineField({

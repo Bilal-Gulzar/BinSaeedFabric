@@ -94,7 +94,20 @@ export default function TopTrending() {
                 <div className="hover:underline mt-3 underline-offset-4 text-gray-700 font-medium">
                   {item.title}
                 </div>
-                <div className="font-semibold text-sm">Rs {item.price}</div>
+                <div className="flex flex-col sm:flex-row sm:gap-3 items-center justify-center">
+                  {item.originalPrice ? (
+                    <span className="text-[#D12442] font-bold text-sm">
+                      Rs.{item.price}
+                    </span>
+                  ) : (
+                    <span className="font-bold text-sm">Rs.{item.price}</span>
+                  )}
+                  {item.originalPrice && (
+                    <div className="font-semibold text-sm line-through">
+                      Rs.{item.originalPrice}
+                    </div>
+                  )}
+                </div>
                 {item.isNew && (
                   <div className="absolute top-1 sm:top-3 left-0 font-medium text-[9px] sm:text-xs text-white bg-[#ffbb49] sm:py-1 sm:px-2 px-1 py-0.5">
                     New In

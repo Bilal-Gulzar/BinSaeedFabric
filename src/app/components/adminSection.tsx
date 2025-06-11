@@ -48,7 +48,6 @@ interface Product {
     const allStatuses = ["pending", "cancelled", "confirmed", "Delivered"]
     // const paymentMethod = order && order !== "NoFound" ? order.paymentMethod : "cod";
   const [isPaid, setIsPaid] = useState(false);
-
   const filteredStatuses =
     order && order !== "NoFound" && order.paymentMethod === "cod"
       ? allStatuses.filter((status) => status !== "confirmed")

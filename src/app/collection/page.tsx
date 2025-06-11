@@ -395,7 +395,6 @@ async  function min_max_price(){
               <div className="space-y-2">
                 {/* {["Men", "Women", "Kids", "Perfume"].map((category) => ( */}
                 {tags.map((category) => (
-                
                   <div key={category} className="flex items-center space-x-2">
                     <input
                       type="checkbox"
@@ -613,7 +612,7 @@ async  function min_max_price(){
                 </div>
                 {/* Simple card design */}
                 {gridCols == 1 ? (
-                  <div className=" w-full mb-8">
+                  <div className=" w-full mb-16">
                     {sortedProducts.map((product) => (
                       <div
                         key={product._id}
@@ -651,15 +650,21 @@ async  function min_max_price(){
                             <div className="md:block hidden">
                               {product.description}
                             </div>
-                            <div className="font-semibold text-sm ">
-                              {product.originalPrice && (
-                                <span className="text-gray-500 line-through text-sm">
-                                  Rs.{product.originalPrice.toLocaleString()}
+                            <div className="flex flex-row gap-3 items-center">
+                              {product.originalPrice ? (
+                                <span className="text-[#D12442] font-bold text-sm">
+                                  Rs.{product.price}
+                                </span>
+                              ) : (
+                                <span className="font-bold text-sm">
+                                  Rs.{product.price}
                                 </span>
                               )}
-                              <div className="font-semibold text-sm">
-                                Rs.{product.price.toLocaleString()}
-                              </div>
+                              {product.originalPrice && (
+                                <div className="font-semibold text-sm line-through">
+                                  Rs.{product.originalPrice}
+                                </div>
+                              )}
                             </div>
                             {product.isNew && (
                               <div className="absolute top-1 sm:top-3 left-0 font-medium  text-[9px] sm:text-xs text-white bg-[#ffbb49]  sm:py-1 sm:px-2 px-1 py-0.5">
@@ -672,7 +677,9 @@ async  function min_max_price(){
                     ))}
                   </div>
                 ) : (
-                  <div className={`grid ${getGridClass()} gap-5 sm:gap-8`}>
+                  <div
+                    className={`grid ${getGridClass()} gap-5 pb-16 sm:gap-8`}
+                  >
                     {sortedProducts.map((product, index) => (
                       <div
                         key={product._id || index}
@@ -683,15 +690,16 @@ async  function min_max_price(){
                             {/* Product Image */}
                             {product.imageUrl ? (
                               <div
-                                className={`w-full h-80   xs:h-56 sm:h-80 
-                                ${gridCols == 2 ? "md:h-[450px]" : "" } bg-gray-100`}
+                                className={`w-full h80   xs:h56 sm:h80 relative
+                                ${gridCols == 2 ? "md:h-[450px]" : ""} bg-gray-100`}
                               >
                                 <Image
                                   src={urlFor(product.imageUrl).url() || ""}
                                   alt={product.title}
                                   width={500}
                                   height={500}
-                                  className="w-full max-h-full mx-auto object-cover"
+                                  // className="w-full max-h-full mx-auto my-auto object-cover"
+                                  className="img-slider-img"
                                   onError={(e) => {
                                     console.error(
                                       "Image failed to load for product:",
@@ -724,15 +732,21 @@ async  function min_max_price(){
                             </div>
 
                             {/* Product Price */}
-                            <div className="flex gap-2 items-center justify-center">
-                              {product.originalPrice && (
-                                <span className="text-gray-500 line-through text-sm">
-                                  Rs.{product.originalPrice.toLocaleString()}
+                            <div className="flex flex-col sm:flex-row sm:gap-3 items-center justify-center">
+                              {product.originalPrice ? (
+                                <span className="text-[#D12442] font-bold text-sm">
+                                  Rs.{product.price}
+                                </span>
+                              ) : (
+                                <span className="font-bold text-sm">
+                                  Rs.{product.price}
                                 </span>
                               )}
-                              <div className="font-semibold text-sm">
-                                Rs.{product.price.toLocaleString()}
-                              </div>
+                              {product.originalPrice && (
+                                <div className="font-semibold text-sm line-through">
+                                  Rs.{product.originalPrice}
+                                </div>
+                              )}
                             </div>
 
                             {product.isNew && (
@@ -763,7 +777,7 @@ async  function min_max_price(){
           ${isFilterOpen ? "fixed inset-0 z-50 min-h-screen " : ""}`}
       >
         <div
-          className={`bg-white min-h-screen fixed top-0  w-[90vw] xs:w-80 h-full overflow-y-auto p-6 duration-500 overflow-x-hidden ${isFilterOpen ? "" : "-translate-x-full "} `}
+          className={`bg-white height fixed top-0  w-[90vw] xs:w-80 h-full overflow-y-auto p-6 duration-500 overflow-x-hidden ${isFilterOpen ? "" : "-translate-x-full "} `}
           ref={modalRef}
         >
           <div className="flex justify-between items-center mb-6">
@@ -910,9 +924,11 @@ async  function min_max_price(){
           </div>
 
           {/* Action Buttons */}
-          <div className="flex gap-3 mt-6">
+          <div className="flex gap-3 my-6 ">
             <button
-              onClick={()=>{clearFilters(),setIsFilterOpen(false)}}
+              onClick={() => {
+                clearFilters(), setIsFilterOpen(false);
+              }}
               className="flex-1 py-2 border border-gray-300 rounded"
             >
               Clear All

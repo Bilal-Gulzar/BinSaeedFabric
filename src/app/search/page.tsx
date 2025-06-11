@@ -245,30 +245,26 @@ export default function Search() {
                     filteredResults.map((item: Product) => (
                       <div
                         key={item._id}
-                        className="text-xs text-center relative space-y-3"
+                        className="text-xs text-center mb-7 relative space-y-3"
                       >
                         <Link href={`/collection/${item._id}`}>
                           <div className="w-full h-full bg-gray-100">
-                          {item.imageUrl ? (
+                            {item.imageUrl ? (
                               <Image
                                 src={item.imageUrl}
                                 alt={item.title}
                                 width={400}
                                 height={400}
-                                style={{
-                                  display: "block",
-                                  flexGrow: 0,
-                                  flexShrink: 0,
-                                }}
+                                className="img-slider-img "
                               />
                             ) : (
-                            <div className="flex justify-center items-center h-full w-full  bg-gray-200">
-                              <p className="text-gray-500 ">
-                                No image available
-                              </p>
-                            </div>
-                          )}
-                            </div>
+                              <div className="flex justify-center items-center h-full w-full  bg-gray-200">
+                                <p className="text-gray-500 ">
+                                  No image available
+                                </p>
+                              </div>
+                            )}
+                          </div>
                         </Link>
                         <div className="hover:underline  mt-3 underline-offset-4 text-gray-700 font-medium">
                           {item.title}

@@ -45,25 +45,33 @@ const {menuBar,setMenuBar} = useAppContext()
         </div>
         <div>
           <div className="font-semibold break-all mt-5">
-            
             <Link href="/collection?category=Men">
-              <div className=" flex items-center tracking-wider justify-between cursor-pointer  py-3.5 border-y border-gray-200 uppercase">
-               Men
+              <div
+                onClick={() => setMenuBar(false)}
+                className=" flex items-center tracking-wider justify-between cursor-pointer  py-3.5 border-y border-gray-200 uppercase"
+              >
+                Men
                 <span>
                   <ChevronRight className="size-5" />
                 </span>
               </div>
             </Link>
             <Link href="/collection?category=Women">
-              <div className=" flex items-center tracking-wider justify-between cursor-pointer  py-3.5 border-y border-gray-200 uppercase">
-               Women
+              <div
+                onClick={() => setMenuBar(false)}
+                className=" flex items-center tracking-wider justify-between cursor-pointer  py-3.5 border-y border-gray-200 uppercase"
+              >
+                Women
                 <span>
                   <ChevronRight className="size-5" />
                 </span>
               </div>
             </Link>
             <Link href="/collection?category=Kids">
-              <div className=" flex items-center tracking-wider justify-between cursor-pointer  py-3.5 border-y border-gray-200 uppercase">
+              <div
+                onClick={() => setMenuBar(false)}
+                className=" flex items-center tracking-wider justify-between cursor-pointer  py-3.5 border-y border-gray-200 uppercase"
+              >
                 Kids
                 <span>
                   <ChevronRight className="size-5" />
@@ -71,7 +79,10 @@ const {menuBar,setMenuBar} = useAppContext()
               </div>
             </Link>
             <Link href="/collection?category=Perfume">
-              <div className=" flex items-center tracking-wider justify-between cursor-pointer  py-3.5 border-y border-gray-200 uppercase">
+              <div
+                onClick={() => setMenuBar(false)}
+                className=" flex items-center tracking-wider justify-between cursor-pointer  py-3.5 border-y border-gray-200 uppercase"
+              >
                 Perfume
                 <span>
                   <ChevronRight className="size-5" />
@@ -79,7 +90,10 @@ const {menuBar,setMenuBar} = useAppContext()
               </div>
             </Link>
             <Link href="/collection">
-              <div className=" flex items-center tracking-wider justify-between cursor-pointer  py-3.5 border-y border-gray-200 uppercase">
+              <div
+                onClick={() => setMenuBar(false)}
+                className=" flex items-center tracking-wider justify-between cursor-pointer  py-3.5 border-y border-gray-200 uppercase"
+              >
                 Collection
                 <span>
                   <ChevronRight className="size-5" />
@@ -87,7 +101,10 @@ const {menuBar,setMenuBar} = useAppContext()
               </div>
             </Link>
             <Link href="/profile">
-              <div className=" flex items-center text-xs tracking-wider  cursor-pointer  py-3.5 border-y border-gray-200 gap-2 text-gray-700 font-medium">
+              <div
+                onClick={() => setMenuBar(false)}
+                className=" flex items-center text-xs tracking-wider  cursor-pointer  py-3.5 border-y border-gray-200 gap-2 text-gray-700 font-medium"
+              >
                 <span>
                   <MdOutlineAccountCircle className="size-5" />
                 </span>

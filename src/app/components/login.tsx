@@ -51,6 +51,7 @@ export default function Login() {
          setTimeout(() => {
            setLogin(false);
            router.push("/orders");
+           router.refresh()
            setEmail("");
            setPassword("");
            
