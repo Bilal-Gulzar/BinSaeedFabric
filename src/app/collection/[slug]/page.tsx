@@ -20,7 +20,6 @@ interface Product {
   price: number;
   qty: number;
   isNew: boolean;
-  discountPercentage: number;
   originalPrice?: number;
   imageUrl: string;
   productImages?: string[] | [];
@@ -60,8 +59,8 @@ export default function ProductPage() {
           _id,
           isNew,
           qty,
+          originalPrice
           sizes[],
-          discountPercentage, 
           description, 
           "imageUrl": thumbnail.asset -> url,
          productImages[] {

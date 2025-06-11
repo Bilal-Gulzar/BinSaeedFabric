@@ -33,6 +33,7 @@ const response =
           tags[], 
           _id, 
           isNew,
+          originalPrice,
           description, 
         "imageUrl": thumbnail.asset -> url,
         }`);

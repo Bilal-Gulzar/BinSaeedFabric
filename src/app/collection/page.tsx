@@ -20,7 +20,6 @@ interface Product {
   price: number;
   qty: number;
   isNew:boolean;
-  discountPercentage:number;
   originalPrice?: number;
   imageUrl: string;
   images?: string[];
@@ -86,7 +85,7 @@ export default function CollectionPage() {
           _id,
           isNew,
           qty,
-          discountPercentage, 
+          originalPrice, 
           description, 
           "imageUrl": thumbnail.asset->url,
          productImages[] {
@@ -690,11 +689,11 @@ async  function min_max_price(){
                             {/* Product Image */}
                             {product.imageUrl ? (
                               <div
-                                className={`w-full h80   xs:h56 sm:h80 relative
+                                className={`w-full h-80   xs:h-56 sm:h-80 
                                 ${gridCols == 2 ? "md:h-[450px]" : ""} bg-gray-100`}
                               >
                                 <Image
-                                  src={urlFor(product.imageUrl).url() || ""}
+                                  src={urlFor(product.imageUrl).url() || "/im3.jpg"}
                                   alt={product.title}
                                   width={500}
                                   height={500}

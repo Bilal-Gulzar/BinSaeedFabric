@@ -71,7 +71,7 @@ export default function Search() {
     isNew,
     qty,
     sizes[],
-    discountPercentage,
+    originalPrice,
     description,
     "imageUrl": thumbnail.asset->url,
   }`;
@@ -245,10 +245,10 @@ export default function Search() {
                     filteredResults.map((item: Product) => (
                       <div
                         key={item._id}
-                        className="text-xs text-center mb-7 relative space-y-3"
+                        className="text-xs text-center  mb-3 space-y-3"
                       >
                         <Link href={`/collection/${item._id}`}>
-                          <div className="w-full h-full bg-gray-100">
+                          <div className="bg-gray-100">
                             {item.imageUrl ? (
                               <Image
                                 src={item.imageUrl}
@@ -269,8 +269,21 @@ export default function Search() {
                         <div className="hover:underline  mt-3 underline-offset-4 text-gray-700 font-medium">
                           {item.title}
                         </div>
-                        <div className="font-semibold text-sm ">
-                          {item.originalPrice}
+                        <div className="flex flex-col sm:flex-row sm:gap-3 items-center justify-center">
+                          {item.originalPrice ? (
+                            <span className="text-[#D12442] font-bold text-sm">
+                              Rs.{item.price}
+                            </span>
+                          ) : (
+                            <span className="font-bold text-sm">
+                              Rs.{item.price}
+                            </span>
+                          )}
+                          {item.originalPrice && (
+                            <div className="font-semibold text-sm line-through">
+                              Rs.{item.originalPrice}
+                            </div>
+                          )}
                         </div>
                         {item.isNew && (
                           <div className="absolute top-1 sm:top-3 left-0 font-medium  text-[9px] sm:text-xs text-white bg-[#ffbb49]  sm:py-1 sm:px-2 px-1 py-0.5">

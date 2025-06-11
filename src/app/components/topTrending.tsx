@@ -36,6 +36,7 @@ export default function TopTrending() {
             price, 
             tags[], 
             _id, 
+            originalPrice,
             isNew,
             description, 
         "imageUrl": thumbnail.asset -> url,
@@ -68,13 +69,14 @@ export default function TopTrending() {
             {item._id ? (
               <Link href={`/collection/${item._id}`}>
                 {item.imageUrl ? (
-                  <div className=" h-52 sm:h-80 w-full bg-gray-100 ">
+                  <div className=" h-80 xs:h-52 sm:h-80 w-full bg-gray-100 ">
                     <Image
                       src={urlFor(item.imageUrl).url() || "/placeholder.svg"}
                       alt={item.title}
                       width={500}
                       height={500}
-                      className="w-full max-h-full mx-auto my-auto object-cover"
+                      // className="w-full max-h-full mx-auto my-auto object-cover"
+                      className="img-slider-img"
                       onError={(e) => {
                         console.error(
                           "Image failed to load for product:",
