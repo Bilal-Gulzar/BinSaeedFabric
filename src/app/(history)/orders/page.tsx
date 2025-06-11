@@ -153,7 +153,7 @@ const handleBuyAgain = async (orderId: string,items:Item[]) => {
           </div>
           {!isLoading ? (
             <div>
-              {orders && orders.length > 0 ? (
+              {orders  && orders.length > 0 ? (
                 <div className="grid sm:grid-cols-2  gap-5 lg:grid-cols-3 pb-52 pt-10">
                   {orders.map((v) => (
                     <div
