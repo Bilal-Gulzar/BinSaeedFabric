@@ -50,5 +50,5 @@ const response = NextResponse.next();
 
 // See "Matching Paths" below to learn more
 export const config = {
-  matcher: ["/cart", "/profile", "/orders/:path*","/logout","/orderID"]
+  matcher: ["/cart", "/profile", "/orders/:path*","/logout"]
 }
