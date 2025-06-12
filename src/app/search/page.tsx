@@ -245,7 +245,7 @@ export default function Search() {
                     filteredResults.map((item: Product) => (
                       <div
                         key={item._id}
-                        className="text-xs text-center  mb-3 space-y-3"
+                        className="text-xs text-center relative  mb-3 space-y-1.5"
                       >
                         <Link href={`/collection/${item._id}`}>
                           <div className="bg-gray-100">

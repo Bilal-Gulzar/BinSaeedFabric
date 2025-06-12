@@ -73,7 +73,7 @@ export default function Header({token}:{token:string | undefined}) {
             </div>
           )}
           <div onClick={() => setSearch(true)}>
-            <SearchIcon size={23} className="hover:scale-125 duration-300" />
+            <SearchIcon size={23} className="hover:scale-125 cursor-pointer duration-300" />
           </div>
           <div
             onClick={() => setCart(true)}

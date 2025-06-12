@@ -6,7 +6,7 @@ import { IoChevronDownOutline } from "react-icons/io5"
 import Image from "next/image"
 import { client } from "@/sanity/lib/client"
 import { urlFor } from "@/sanity/lib/image"
-import { disableBodyScroll, enableBodyScroll } from "body-scroll-lock";
+import { clearAllBodyScrollLocks, disableBodyScroll, enableBodyScroll } from "body-scroll-lock";
 import { useRouter, useSearchParams } from "next/navigation"
 import useAppContext from "@/context/ContextAPI"
 import ProductGridSkeleton from "@/app/components/ProductGridSkeleton"
@@ -48,7 +48,8 @@ export default function CollectionPage() {
   const [priceRange, setPriceRange] = useState<[number, number]>([1000, 5000]);
   const [inStockOnly, setInStockOnly] = useState(false)
   const [sortOption, setSortOption] = useState("dateN")
-
+  const [applySort, setApplySort] = useState("dateN")
+  // console.log(applySort,"applySort")
   // Products state
   const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
@@ -139,6 +140,37 @@ async  function min_max_price(){
          if (modalRef.current) enableBodyScroll(modalRef.current);
        };
      }, [isFilterOpen, isSortOpen]);
+
+    // useEffect(() => {
+    //   const filterEl = modalRef.current;
+    //   if (!filterEl) return;
+
+    //   if (isFilterOpen) {
+    //     disableBodyScroll(filterEl);
+    //   } else {
+    //     enableBodyScroll(filterEl);
+    //   }
+
+    //   return () => {
+    //     enableBodyScroll(filterEl);
+    //   };
+    // }, [isFilterOpen]);
+
+    // useEffect(() => {
+    //   const sortEl = modalRef.current;
+    //   if (!sortEl) return;
+
+    //   if (isSortOpen) {
+    //     disableBodyScroll(sortEl);
+    //   } else {
+    //     enableBodyScroll(sortEl);
+    //   }
+
+    //   return () => {
+    //     enableBodyScroll(sortEl);
+    //   };
+    // }, [isSortOpen]);
+    
 
   useEffect(() => {
     if (products.length > 0) {
@@ -573,9 +605,9 @@ async  function min_max_price(){
           <div className="p-4">
             {sortedProducts.length === 0 ? (
               <div className="flex flex-col items-center gap-5 py-14">
-                <div className="text-xs text-gray-500">
+                {/* <div className="text-xs text-gray-500">
                   Showing 0 of {products.length} products
-                </div>
+                </div> */}
                 <div className="font-semibold text-sm space-y-2 text-center">
                   <div>NO PRODUCT FOUND</div>
                   {selectedCategories.length > 0 ? (
@@ -693,7 +725,9 @@ async  function min_max_price(){
                                 ${gridCols == 2 ? "md:h-[450px]" : ""} bg-gray-100`}
                               >
                                 <Image
-                                  src={urlFor(product.imageUrl).url() || "/im3.jpg"}
+                                  src={
+                                    urlFor(product.imageUrl).url() || "/im3.jpg"
+                                  }
                                   alt={product.title}
                                   width={500}
                                   height={500}
@@ -945,7 +979,7 @@ async  function min_max_price(){
       {/* Mobile Sort Modal */}
       {isSortOpen && (
         <div className="fixed inset-0 bg-black/80 bg-opacity-50 z-50 flex justify-center items-center">
-          <div className="bg-white w-80 rounded-lg p-6" ref={modalRef}>
+          <div className="bg-white w-80 rounded-lg p-6">
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-lg font-semibold">Sort By</h2>
               <button
@@ -985,12 +1019,12 @@ async  function min_max_price(){
                     id={`sort-${option.value}`}
                     name="sort-option"
                     value={option.value}
-                    checked={sortOption === option.value}
+                    checked={applySort === option.value}
                     onChange={() => {
-                      setSortOption(option.value);
-                      setIsSortOpen(false);
+                      setApplySort(option.value);
+                      // setIsSortOpen(false);
                     }}
-                    className="h-4 w-4 border-gray-300"
+                    className="h-4 w-4 border-gray-300 accent-black"
                   />
                   <label htmlFor={`sort-${option.value}`} className="text-sm">
                     {option.label}
@@ -1000,7 +1034,9 @@ async  function min_max_price(){
             </div>
 
             <button
-              onClick={() => setIsSortOpen(false)}
+              onClick={() => {
+                setSortOption(applySort), setIsSortOpen(false);
+              }}
               className="w-full mt-6 py-2 bg-black text-white rounded hover:bg-gray-800"
             >
               Apply
