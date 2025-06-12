@@ -79,7 +79,8 @@ export default function CollectionPage() {
         const tags = await client.fetch(`*[_type == "product"].tags[]`);
         const uniqueTags = [...new Set(tags)] as string[];
         setTags(uniqueTags);
-        const response = await client.fetch(`*[_type == "product"]{
+        const response =
+          await client.fetch(`*[_type == "product"] | order(_createdAt desc) {
          title, 
           price, 
           tags[], 

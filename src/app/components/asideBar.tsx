@@ -151,7 +151,7 @@ export default function AsideBar({
       </section>
 
       <section
-        className={`height transition-all duration-500 overflow-x-hidden border-t border-gray-500 bg-white fixed px-3 left-0 top-[90px] bottom-0 z-30  w-[80vw] md:hidden ${
+        className={`height transition-all duration-500 overflow-x-hidden border-t border-gray-500 bg-white fixed px-3 left-0 top-[90px] bottom-0 z-40  w-[80vw] md:hidden ${
           showdiv ? "" : "-translate-x-full"
         }  `}
         ref={modalRef}

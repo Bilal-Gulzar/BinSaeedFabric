@@ -148,7 +148,7 @@ console.log(a)
 
   export const GetUserOrders = async ()=>{ 
    const { email } = await getCookies();
-    const query = `*[_type == "order" &&  customerEmail == $email]{
+    const query = `*[_type == "order" &&  customerEmail == $email] | order(_createdAt desc){
       _id,
       _createdAt,
         orderDate,

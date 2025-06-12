@@ -53,9 +53,9 @@ export default function Search() {
       // Navigate to collection page with search parameters
       const searchParams = new URLSearchParams()
       searchParams.set("search", inputValue.trim())
-      if (matchedCategory) {
-        searchParams.set("category", matchedCategory)
-      }
+      // if (matchedCategory) {
+      //   searchParams.set("category", matchedCategory)
+      // }
 
       router.push(`/search?${searchParams.toString()}`)
     }
