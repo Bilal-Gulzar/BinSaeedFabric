@@ -8,13 +8,13 @@ export default function AboutPage() {
         <div className="p-4 sm:p-6 lg:p-20 space-y-5 sm:order-1 order-2">
           <h1 className="font-bold text-xl uppercase">About Us</h1>
           <p className="text-xs leading-6">
-            Bin Saeed has set out to achieve success by crafting true
+             T Self has set out to achieve success by crafting true
             relationships within the industry, maintaining high quality of our
             products, and solid partnerships with our clients. Over the years,
-            Bin Saeed has transformed into a well-established brand by
+            T Self has transformed into a well-established brand by
             maintaining and staying true to our reality. We continue to produce
             fusion of styles to complement all your needs. We produce and
-            deliver both private label garments. Product mix at Bin Saeed ranges
+            deliver both private label garments. Product mix at T Self ranges
             from 3 piece lawn embroidery stitched & unstitched, 2 piece
             exclusive chiffon shirts. We use Pure Fabrics, Fine Embroidery &
             excellent stitching. At Bin Saeed, we strongly believe that Fashion

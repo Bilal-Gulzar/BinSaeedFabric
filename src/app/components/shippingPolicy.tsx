@@ -65,7 +65,7 @@ const modalRef = useRef<HTMLDivElement | null>(null);
               Domestic Shipping
             </h2>
             <p>
-              BIN SAEED is offering “Charged Shipping” via M&P for over
+              T SELF is offering “Charged Shipping” via M&P for over
               Pakistan. All domestic orders once processed will be delivered
               within 3-7 working days; the processing time of order is not
               included in the mentioned timeframe and this processing time may
@@ -86,7 +86,7 @@ const modalRef = useRef<HTMLDivElement | null>(null);
               quantity and the destination where the order is to be shipped. The
               items in stock will be delivered to you in 5-7 working days once
               the order is placed, this doesn’t include the processing time of
-              order. Bin Saeed is only responsible for providing the tracking
+              order. T Self is only responsible for providing the tracking
               number for International Parcels after two days of payment
               received. In case of Delays , Misplace, Damages or any other
               Condition faces will be the responsibility of the Logistic Company
@@ -104,7 +104,7 @@ const modalRef = useRef<HTMLDivElement | null>(null);
               There will be no return or exchange facility for all the orders
               that are or will be shipped across the border. But, you may
               contact at{" "}
-              <span className="text-blue-500">sales@binsaeedfabric.com</span> ,
+              <span className="text-blue-500">tselffabric@gmail.com</span> ,
               and let our Customer Services Representative know if you receive
               the ordered item in wrong size or defective condition, then he or
               she will assist you accordingly and resolve the issue you are
@@ -116,12 +116,12 @@ const modalRef = useRef<HTMLDivElement | null>(null);
               Duties and Taxes
             </h2>
             <p>
-              BIN SAEED ships all the orders on Delivery Duty Unpaid (DDU) basis
+              T SELF ships all the orders on Delivery Duty Unpaid (DDU) basis
               which means that a customer is liable for paying any sort of
               import duties or local sales tax which may be charged from you at
               the time of purchasing.
               <br />
-              <br /> BIN SAEED will make deduction of shipping charges as well
+              <br />T SELF will make deduction of shipping charges as well
               as sales and duty tax from the total amount, in case the shipment
               is refused at the time of delivery.
               <br />

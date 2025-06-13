@@ -54,7 +54,7 @@ import React from "react";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 
-export default function InfiniteScrollingtLoading({
+export default function NoMoreProduct({
   progress = 0,
   loadedCount,
   totalCount,
@@ -76,9 +76,9 @@ export default function InfiniteScrollingtLoading({
 
         <Button
           variant="ghost"
-          className="w-full hover:bg-black duration-300  border border-gray-300 !py-4 "
+          className="w-full hover:bg-black duration-300 hover:text-white text-gray-400 text-sm   border border-gray-300 !py-4 "
         >
-          <div className="lds-dual-ring"></div>
+           No more product to show
         </Button>
       </div>
     </div>

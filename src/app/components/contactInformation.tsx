@@ -61,9 +61,9 @@ const modalRef = useRef<HTMLDivElement | null>(null);
         </div>
         <div className=" overflow-y-auto max-h-[calc(75vh-40px)] pb-8 scrollbar-hide  mt-5 text-xs">
           <div className="mb-5 text-sm space-y-3">
-            <p>Trade name: BinSaeedFabrics</p>
-            <p>Phone number:</p>
-            <p>Email: sales@binsaeedfabric.com</p>
+            <p>Trade name: T Self Fabric</p>
+            <p>Phone number: +923278690391 </p>
+            <p>Email: tselffabric@gmail.com</p>
             <p>
               Physical address: 71-75, Shelton Street, Karachi WC2H9JQ, Pakistan
             </p>

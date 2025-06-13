@@ -8,8 +8,12 @@ import { client } from "@/sanity/lib/client"
 import { urlFor } from "@/sanity/lib/image"
 import { clearAllBodyScrollLocks, disableBodyScroll, enableBodyScroll } from "body-scroll-lock";
 import { useRouter, useSearchParams } from "next/navigation"
+import InfiniteScroll from "react-infinite-scroll-component";
 import useAppContext from "@/context/ContextAPI"
 import ProductGridSkeleton from "@/app/components/ProductGridSkeleton"
+import InfiniteScrollingtLoading from "../components/infiniteScrollingtLoading"
+import NoMoreProduct from "../components/NoMoreProduct"
+import { resolve } from "path"
 
 type GridSize = 1 | 2 | 3 | 4
  
@@ -19,284 +23,478 @@ interface Product {
   description: string;
   price: number;
   qty: number;
-  isNew:boolean;
+  isNew: boolean;
   originalPrice?: number;
   imageUrl: string;
-  images?: string[];
+  productImages?: string[];
   category?: string;
   tags?: string[];
 }
 
 export default function CollectionPage() {
-  const router = useRouter()
-   const modalRef = useRef<HTMLDivElement| null>(null);
-  
-  const searchParams = useSearchParams()
-  const { searchTerm, setSearchTerm, setSearchCategories } = useAppContext()
+  const router = useRouter();
+  const modalRef = useRef<HTMLDivElement | null>(null);
+
+  const searchParams = useSearchParams();
+  const { searchTerm, setSearchTerm, setSearchCategories } = useAppContext();
 
   // Basic UI state
-  const [gridCols, setGridCols] = useState<GridSize>(2)
-  const [isFilterOpen, setIsFilterOpen] = useState(false)
-  const [isSortOpen, setIsSortOpen] = useState(false)
-  const [tags,setTags] = useState<string[]>([])
+  const [gridCols, setGridCols] = useState<GridSize>(2);
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [isSortOpen, setIsSortOpen] = useState(false);
+  const [tags, setTags] = useState<string[]>([]);
   // const [higestPrice, setHigestPrice] = useState<number>(0);
   const [minAllowed, setMinAllowed] = useState<number>(0);
   const [maxAllowed, setMaxAllowed] = useState<number>(1000);
-
+  const [page, setPage] = useState<number>(1);
+  const [hasMore, setHasMore] = useState<boolean>(true);
+  const [totalCount, setTotalCount] = useState<number | null>(null);
   // Filter state
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([])
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [priceRange, setPriceRange] = useState<[number, number]>([1000, 5000]);
-  const [inStockOnly, setInStockOnly] = useState(false)
-  const [sortOption, setSortOption] = useState("dateN")
-  const [applySort, setApplySort] = useState("dateN")
+  const [inStockOnly, setInStockOnly] = useState(false);
+  const [inset, setInset] = useState(false);
+  const [sortOption, setSortOption] = useState("dateN");
+  const [applySort, setApplySort] = useState("dateN");
   // console.log(applySort,"applySort")
   // Products state
-  const [products, setProducts] = useState<Product[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const filtersActive =
+    selectedCategories.length > 0 ||
+    inStockOnly ||
+    priceRange[0] !== minAllowed ||
+    priceRange[1] !== maxAllowed;
+    
+
+  const fetchProductCount = async () => {
+    let filterQuery = "";
+
+    if (filtersActive) {
+      const filters = [];
+
+      if (selectedCategories.length > 0) {
+        const catList = selectedCategories.map((cat) => `"${cat}"`).join(",");
+        filters.push(`count(tags[@ in [${catList}]]) > 0`);
+      }
+
+      if (priceRange) {
+        filters.push(`price >= ${priceRange[0]} && price <= ${priceRange[1]}`);
+      }
+
+      if (inStockOnly) {
+        filters.push(`qty > 0`);
+      }
+
+      filterQuery = filters.length > 0 ? ` && ${filters.join(" && ")}` : "";
+    }
+
+    const countQuery = `count(*[_type == "product"${filterQuery}])`;
+    const count = await client.fetch<number>(countQuery);
+    setTotalCount(count);
+  };
+  
 
   // Initialize filters from URL parameters
   useEffect(() => {
-    const searchParam = searchParams.get("search")
-    const categoryParam = searchParams.get("category")
+    const searchParam = searchParams.get("search");
+    const categoryParam = searchParams.get("category");
 
     // if (searchParam) {
     //   setSearchTerm(searchParam)
     // }
 
     if (categoryParam) {
-      const categories = categoryParam.split(",")
-      setSelectedCategories(categories)
-      setSearchCategories(categories)
+      const categories = categoryParam.split(",");
+      setSelectedCategories(categories);
+      setSearchCategories(categories);
     }
-  }, [searchParams, setSearchCategories])
+  }, [searchParams, setSearchCategories]);
 
+  // Fetch filtered products paginated
+  const fetchPaginatedFilteredProducts = async (page: number, limit = 10) => {
+    const start = (page - 1) * limit;
+    const end = start + limit;
+
+    const filters = [];
+
+    if (selectedCategories.length > 0) {
+      const categoryFilter = selectedCategories
+        .map((cat) => `"${cat}"`)
+        .join(",");
+      filters.push(`count(tags[@ in [${categoryFilter}]]) > 0`);
+    }
+    if (priceRange) {
+      filters.push(`price >= ${priceRange[0]} && price <= ${priceRange[1]}`);
+    }
+    if (inStockOnly) {
+      filters.push(`qty > 0`);
+    }
+
+    const whereClause = filters.length ? ` && ${filters.join(" && ")}` : "";
+
+    const query = `*[_type == "product"${whereClause}] | order(_createdAt desc)[${start}...${end}] {
+    title, price, tags[], _id, isNew, qty, originalPrice, description,
+    "imageUrl": thumbnail.asset->url,
+    productImages[] { asset->{ url } }
+  }`;
+
+    return await client.fetch(query);
+  };
   // Fetch products on mount
-  useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        min_max_price()
-        const tags = await client.fetch(`*[_type == "product"].tags[]`);
-        const uniqueTags = [...new Set(tags)] as string[];
-        setTags(uniqueTags);
-        const response =
-          await client.fetch(`*[_type == "product"] | order(_createdAt desc) {
-         title, 
-          price, 
-          tags[], 
-          _id,
-          isNew,
-          qty,
-          originalPrice, 
-          description, 
-          "imageUrl": thumbnail.asset->url,
-         productImages[] {
-    asset->{
-      url
-    }
-  }
-        }`);
-        // console.log("Fetched products:", response)
-        setProducts(response)
-      } catch (err) {
-        console.error("Error fetching products:", err)
-        setError("Failed to load products")
-      } finally {
-        setLoading(false)
-      }
+  // useEffect(() => {
+  //   const fetchProducts = async () => {
+  //     try {
+  //       min_max_price()
+  //       const tags = await client.fetch(`*[_type == "product"].tags[]`);
+  //       const uniqueTags = [...new Set(tags)] as string[];
+  //       setTags(uniqueTags);
+  //       const response =
+  //         await client.fetch(`*[_type == "product"] | order(_createdAt desc) {
+  //        title,
+  //         price,
+  //         tags[],
+  //         _id,
+  //         isNew,
+  //         qty,
+  //         originalPrice,
+  //         description,
+  //         "imageUrl": thumbnail.asset->url,
+  //        productImages[] {
+  //   asset->{
+  //     url
+  //   }
+  // }
+  //       }`);
+  //       // console.log("Fetched products:", response)
+  //       setProducts(response)
+  //     } catch (err) {
+  //       console.error("Error fetching products:", err)
+  //       setError("Failed to load products")
+  //     } finally {
+  //       setLoading(false)
+  //     }
 
+  //   }
 
-    }
+  //   fetchProducts()
+  // }, [])
 
-    
-    fetchProducts()
-  }, [])
+  const fetchPaginatedProducts = async (page: number, limit: number = 10) => {
+    const start = (page - 1) * limit;
+    const end = start + limit;
 
-async  function min_max_price(){
-  const highest_Price = await client.fetch(
-    `*[_type == "product"] | order(price desc)[0].price`
-  );
-  setMaxAllowed(highest_Price);
+    return await client.fetch(
+      `*[_type == "product"] | order(_createdAt desc)[${start}...${end}] {
+        title, 
+        price, 
+        tags[], 
+        _id,
+        isNew,
+        qty,
+        originalPrice, 
+        description, 
+        "imageUrl": thumbnail.asset->url,
+        productImages[] {
+          asset->{ url }
+        }
+      }`
+    );
+  };
 
-  const minPrice: number = await client.fetch(
-    `*[_type == "product"] | order(price asc)[0].price`
-  );
-  setPriceRange([minPrice, highest_Price]);
+  // const loadMore = async () => {
+  //   await new Promise((resolve) => setTimeout(resolve, 1500));
+  //   try {
+  //     await fetchProductCount();
+  //     const newProducts: Product[] = await fetchPaginatedProducts(page);
+  //     if (newProducts.length === 0) {
+  //       setHasMore(false);
+  //     } else {
+  //       setProducts((prev) => [...prev, ...newProducts]);
+  //       setPage((prev) => prev + 1);
+  //     }
+
+  //     const newTags = newProducts.flatMap((p) => p.tags || []);
+  //     setTags((prevTags) => {
+  //       const combined = [...prevTags, ...newTags];
+  //       return [...new Set(combined)]; // unique tags only
+  //     });
+  //   } catch (err) {
+  //     console.error("Error fetching more products:", err);
+  //     setError("Failed to load products");
+  //     setHasMore(false);
+  //   }
+  // };
+
   
-  setMinAllowed(minPrice)
-
+  // // Default paginated fetch (no filters)
+  // const fetchPaginatedProducts = async (page: number, limit = 10) => {
+  //   const start = (page - 1) * limit;
+  //   const end = start + limit;
+  //   const query = `*[_type == "product"] | order(_createdAt desc)[${start}...${end}] {
+  //     title, price, tags[], _id, isNew, qty, originalPrice, description,
+  //     "imageUrl": thumbnail.asset->url,
+  //     productImages[] { asset->{ url } }
+  //   }`;
+  
+  //   return await client.fetch(query);
+  // };
+  
+  const loadMore = async () => {
+    // if (!hasMore) return;
+    await new Promise((resolve) => setTimeout(resolve, 800));
+    try {
+      const nextPage = page;
+      let newProducts: Product[] = [];
+  
+      if (filtersActive) {
+        newProducts = await fetchPaginatedFilteredProducts(nextPage);
+      } else {
+        newProducts = await fetchPaginatedProducts(nextPage);
+        const newTags = newProducts.flatMap((p) => p.tags || []);
+            setTags((prevTags) => {
+              const combined = [...prevTags, ...newTags];
+              return [...new Set(combined)]; // unique tags only
+            });
+      }
+  
+      if (newProducts.length === 0) {
+        setHasMore(false);
+      } else {
+        setProducts(prev => [...prev, ...newProducts]);
+        setPage(prev => prev + 1);
+      }
+    } catch (err) {
+      console.error("Failed to load more products", err);
+      setHasMore(false);
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+async function AllowInset(){
+  setInset(true);
+  await new Promise((resolve) => setTimeout(resolve, 1000));
+  setInset(false);
 }
 
+  // Reset products & page when filters change
+  useEffect(() => {
+    const fetchInitial = async () => {
+      setHasMore(true);
+      fetchProductCount()
 
-     useEffect(() => {
-       if (!modalRef.current) return;
+      setPage(1);
 
-       if (isFilterOpen || isSortOpen) {
-         disableBodyScroll(modalRef.current);
-       } else {
-         enableBodyScroll(modalRef.current);
-       }
+      try {
+        let initialProducts: Product[] = [];
 
-       return () => {
-         if (modalRef.current) enableBodyScroll(modalRef.current);
-       };
-     }, [isFilterOpen, isSortOpen]);
+        if (filtersActive) {
+          initialProducts = await fetchPaginatedFilteredProducts(1);
+        } else {
+          initialProducts = await fetchPaginatedProducts(1);
+        }
 
-    // useEffect(() => {
-    //   const filterEl = modalRef.current;
-    //   if (!filterEl) return;
+        setProducts(initialProducts);
+        setPage(2);
+        setHasMore(initialProducts.length > 0);
+      } catch (err) {
+        console.error("Failed to fetch products", err);
+        setProducts([]);
+        setHasMore(false);
+      } finally {
+        setLoading(false);
+      }
+    };
+  
+    fetchInitial();
+  }, [selectedCategories, priceRange, inStockOnly]);
+  
 
-    //   if (isFilterOpen) {
-    //     disableBodyScroll(filterEl);
-    //   } else {
-    //     enableBodyScroll(filterEl);
-    //   }
-
-    //   return () => {
-    //     enableBodyScroll(filterEl);
-    //   };
-    // }, [isFilterOpen]);
-
-    // useEffect(() => {
-    //   const sortEl = modalRef.current;
-    //   if (!sortEl) return;
-
-    //   if (isSortOpen) {
-    //     disableBodyScroll(sortEl);
-    //   } else {
-    //     enableBodyScroll(sortEl);
-    //   }
-
-    //   return () => {
-    //     enableBodyScroll(sortEl);
-    //   };
-    // }, [isSortOpen]);
-    
+  const progress = totalCount
+    ? Math.min((products.length / totalCount) * 100, 100)
+    : 0;
 
   useEffect(() => {
-    if (products.length > 0) {
-      const allTags = products.flatMap((p) => p.tags || [])
-      const uniqueTags = [...new Set(allTags)]
-      // console.log("Available tags/categories in products:", uniqueTags)
-      // console.log(
-      //   "Sample products with tags:",
-      //   products.slice(0, 5).map((p) => ({ title: p.title, tags: p.tags })),
-      // )
-    }
-  }, [products])
+    const fetchInitial = async () => {
+      try {
+        // Optional: min_max_price() call if you still need it
+        min_max_price();
+        await fetchProductCount();
+        // const tags = await client.fetch(`*[_type == "product"].tags[]`);
+        // const uniqueTags = [...new Set(tags)] as string[];
+        // setTags(uniqueTags);
 
-  const productHasCategory = (product: Product, categories: string[]): boolean => {
-    if (!product.tags || product.tags.length === 0) return false
-    return categories.some((category) => product.tags?.includes(category))
+        const initialProducts: Product[] = await fetchPaginatedProducts(1);
+        setProducts(initialProducts);
+
+        const initialTags: string[] = initialProducts.flatMap(
+          (p) => p.tags || []
+        );
+        const uniqueTags: string[] = [...new Set(initialTags)];
+        setTags(uniqueTags);
+
+        setPage(2); // Next page
+      } catch (err) {
+        console.error("Error fetching products:", err);
+        setError("Failed to load products");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchInitial();
+  }, []);
+
+  async function min_max_price() {
+    const highest_Price = await client.fetch(
+      `*[_type == "product"] | order(price desc)[0].price`
+    );
+    setMaxAllowed(highest_Price);
+
+    const minPrice: number = await client.fetch(
+      `*[_type == "product"] | order(price asc)[0].price`
+    );
+    setPriceRange([minPrice, highest_Price]);
+
+    setMinAllowed(minPrice);
   }
+
+  useEffect(() => {
+    if (!modalRef.current) return;
+
+    if (isFilterOpen || isSortOpen) {
+      disableBodyScroll(modalRef.current);
+    } else {
+      enableBodyScroll(modalRef.current);
+    }
+
+    return () => {
+      if (modalRef.current) enableBodyScroll(modalRef.current);
+    };
+  }, [isFilterOpen, isSortOpen]);
+
+  const productHasCategory = (
+    product: Product,
+    categories: string[]
+  ): boolean => {
+    if (!product.tags || product.tags.length === 0) return false;
+    return categories.some((category) => product.tags?.includes(category));
+  };
 
   const getProductCategory = (product: Product): string | null => {
-    if (!product.tags || product.tags.length === 0) return null
-    const categoryTags = ["Men", "Women", "Kids", "Perfume"]
-    return product.tags.find((tag) => categoryTags.includes(tag)) || null
-  }
+    if (!product.tags || product.tags.length === 0) return null;
+    const categoryTags = ["Men", "Women", "Kids", "Perfume"];
+    return product.tags.find((tag) => categoryTags.includes(tag)) || null;
+  };
 
   // Filter products based on current filters and search
-  const filteredProducts = products.filter((product) => {
-    // Search term filter (search in title and tags)
-    // if (searchTerm) {
-    //   const searchLower = searchTerm.toLowerCase()
-    //   const titleMatch = product.title.toLowerCase().includes(searchLower)
-    //   const tagsMatch = product.tags?.some((tag) => tag.toLowerCase().includes(searchLower)) || false
-    //   if (!titleMatch && !tagsMatch) {
-    //     return false
-    //   }
-    // }
+  // const filteredProducts = products.filter((product) => {
+  //   // Category filter - check if product tags include any selected categories
+  //   if (selectedCategories.length > 0) {
+  //     if (!productHasCategory(product, selectedCategories)) {
+  //       return false;
+  //     }
+  //   }
 
-    // Category filter - check if product tags include any selected categories
-    if (selectedCategories.length > 0) {
-      if (!productHasCategory(product, selectedCategories)) {
-        return false
-      }
-    }
+  //   // Price filter
+  //   if (product.price < priceRange[0] || product.price > priceRange[1]) {
+  //     return false;
+  //   }
 
-    // Price filter
-    if (product.price < priceRange[0] || product.price > priceRange[1]) {
-      return false
-    }
+  //   // In stock filter (mock implementation)
+  //   if (inStockOnly && product.tags?.includes("OutOfStock")) {
+  //     return false;
+  //   }
+  //   if (inStockOnly && !product.qty) {
+  //     return false;
+  //   }
 
-    // In stock filter (mock implementation)
-    if (inStockOnly && product.tags?.includes("OutOfStock")) {
-      return false
-    }
-
-    return true
-  })
+  //   return true;
+  // });
 
   // Sort products
-  const sortedProducts = [...filteredProducts].sort((a, b) => {
+  const sortedProducts = [...products].sort((a, b) => {
     switch (sortOption) {
       case "A-Z":
-        return a.title.localeCompare(b.title)
+        return a.title.localeCompare(b.title);
       case "Z-A":
-        return b.title.localeCompare(a.title)
+        return b.title.localeCompare(a.title);
       case "PriceL":
-        return a.price - b.price
+        return a.price - b.price;
       case "PriceH":
-        return b.price - a.price
+        return b.price - a.price;
       default:
-        return 0
+        return 0;
     }
-  })
+  });
 
   // Grid class based on selected columns
   const getGridClass = () => {
     switch (gridCols) {
       case 1:
-        return ""
+        return "";
       case 2:
-        return "grid-cols-1 xs:grid-cols-2"
+        return "grid-cols-1 xs:grid-cols-2";
       case 3:
-        return "grid-cols-1 xs:grid-cols-2 md:grid-cols-3"
+        return "grid-cols-1 xs:grid-cols-2 md:grid-cols-3";
       case 4:
-        return "grid-cols-1 xs:grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
+        return "grid-cols-1 xs:grid-cols-2 md:grid-cols-3 lg:grid-cols-4";
       default:
-        return "grid-cols-1 xs:grid-cols-2"
+        return "grid-cols-1 xs:grid-cols-2";
     }
-  }
+  };
 
   // Toggle category selection and update URL
-  const toggleCategory = (category: string) => {
+  const toggleCategory = async (category: string) => {
+    await AllowInset()
     const newCategories = selectedCategories.includes(category)
       ? selectedCategories.filter((c) => c !== category)
-      : [...selectedCategories, category]
+      : [...selectedCategories, category];
 
-    setSelectedCategories(newCategories)
-    setSearchCategories(newCategories)
+    setSelectedCategories(newCategories);
+    setSearchCategories(newCategories);
 
     // Update URL parameters
-    const params = new URLSearchParams(searchParams.toString())
+    const params = new URLSearchParams(searchParams.toString());
     if (newCategories.length > 0) {
-      params.set("category", newCategories.join(","))
+      params.set("category", newCategories.join(","));
     } else {
-      params.delete("category")
+      params.delete("category");
     }
 
-    router.push(`/collection?${params.toString()}`, { scroll: false })
-  }
+    router.push(`/collection?${params.toString()}`, { scroll: false });
+  };
 
   // Clear all filters
   const clearFilters = () => {
-     min_max_price()
-    setSelectedCategories([])
-    setInStockOnly(false)
-    setSearchCategories([])
+    min_max_price();
+    setSelectedCategories([]);
+    setInStockOnly(false);
+    setSearchCategories([]);
 
     // Clear URL parameters
-    router.push("/collection", { scroll: false })
+    router.push("/collection", { scroll: false });
+  };
+
+
+  const handleStock = async()=>{
+  setIsFilterOpen(false);
+  setInset(true)
+    await new Promise((resolve)=>setTimeout((resolve),1000))
+   setInset(false);
+
+    setInStockOnly(!inStockOnly)
+
+
   }
-
-
 
   // Show skeleton while loading
   if (loading) {
     return (
-      <div className="max-w-[1500px] mx-auto min-h-screen">
+      <div className="max-w-[1500px] relative mx-auto min-h-screen">
         {/* Breadcrumb */}
         <div className="text-xs bg-gradient-to-t from-pink500 to-[#fde6e6] lg:bg-white w-full flex justify-center py-10 space-x-2 text-gray-800">
           <Link href="/">Home</Link>
@@ -349,10 +547,20 @@ async  function min_max_price(){
     );
   }
 
-  if (error) return <div className="p-8 text-center text-red-500">{error}</div>
+  if (error) return <div className="p-8 text-center text-red-500">{error}</div>;
 
   return (
     <div className="max-w-[1500px] mx-auto min-h-screen">
+      {inset && (
+        <div className="inset-0 flex justify-center items-center fixed z-50 bg-white/60 ">
+          <div className="custom-spinner">
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+          </div>
+        </div>
+      )}
       {/* Breadcrumb */}
       <div className="text-xs bg-gradient-to-t from-pink-50 to-[#fde6e6] lg:bg-white w-full flex justify-center py-10 space-x-2 text-gray-800">
         <Link href="/">Home</Link>
@@ -437,14 +645,14 @@ async  function min_max_price(){
                     />
                     <label htmlFor={`desktop-${category}`} className="text-sm">
                       {category}
-                      <span className="text-gray-400 ml-1">
+                      {/* <span className="text-gray-400 ml-1">
                         (
                         {
                           products.filter((p) => p.tags?.includes(category))
                             .length
                         }
                         )
-                      </span>
+                      </span> */}
                     </label>
                   </div>
                 ))}
@@ -484,7 +692,8 @@ async  function min_max_price(){
                   type="checkbox"
                   id="desktop-in-stock"
                   checked={inStockOnly}
-                  onChange={() => setInStockOnly(!inStockOnly)}
+                  // onChange={() => setInStockOnly(!inStockOnly)}
+                  onChange={handleStock}
                   className="h-4 w-4 accent-black rounded border-gray-300"
                 />
                 <label htmlFor="desktop-in-stock" className="text-sm">
@@ -636,167 +845,220 @@ async  function min_max_price(){
               </div>
             ) : (
               <>
-                <div className="text-xs text-gray-500 mb-4">
-                  Showing {sortedProducts.length} of {products.length} products
-                  {/* {searchTerm && ` for "${searchTerm}"`} */}
-                  {selectedCategories.length > 0 &&
+                {/* <div className="text-xs text-gray-500 mb-4">
+                  Showing {sortedProducts.length} of {products.length} products */}
+                {/* {searchTerm && ` for "${searchTerm}"`} */}
+                {/* {selectedCategories.length > 0 &&
                     ` in ${selectedCategories.join(", ")}`}
-                </div>
+                </div> */}
                 {/* Simple card design */}
                 {gridCols == 1 ? (
-                  <div className=" w-full mb-16">
-                    {sortedProducts.map((product) => (
-                      <div
-                        key={product._id}
-                        className="space-y-5 border-b mb-10 border-gray-300"
-                      >
-                        <div className="text-xs flex sm:flex-row flex-col gap-2 sm:gap-5   md:gap-10 relative space-y-3  pb-6">
-                          <Link href={`/collection/${product._id}`}>
-                            <div className="h-96 w-full sm:w-sm shrink-0 grow bg-gray-100">
+                  <InfiniteScroll
+                    dataLength={products.length}
+                    next={loadMore}
+                    hasMore={hasMore}
+                    loader={
+                      products.length > 0 && totalCount !== null ? (
+                        <InfiniteScrollingtLoading
+                          progress={progress}
+                          loadedCount={products.length}
+                          totalCount={totalCount}
+                        />
+                      ) : (
+                        <div className="text-center py-4 text-gray-500">
+                          Loading products...
+                        </div>
+                      )
+                    }
+                    endMessage={
+                      <NoMoreProduct
+                        progress={progress}
+                        loadedCount={products.length}
+                        totalCount={totalCount ?? 0}
+                      />
+                    }
+                  >
+                    <div className=" w-full mb-16">
+                      {sortedProducts.map((product) => (
+                        <div
+                          key={product._id}
+                          className="space-y-5 border-b mb-10 border-gray-300"
+                        >
+                          <div className="text-xs flex sm:flex-row flex-col gap-2 sm:gap-5   md:gap-10 relative space-y-3  pb-6">
+                            <Link href={`/collection/${product._id}`}>
+                              <div className="h-96 w-full sm:w-sm shrink-0 grow bg-gray-100">
+                                {product.imageUrl ? (
+                                  <Image
+                                    src={urlFor(product.imageUrl).url() || ""}
+                                    alt={product.title}
+                                    className="img-slider-img "
+                                    width={280}
+                                    height={280}
+                                  />
+                                ) : (
+                                  <div className="w-full flex justify-center items-center h-full bg-gray-200">
+                                    <p className="text-gray-500 ">
+                                      No image available
+                                    </p>
+                                  </div>
+                                )}
+                              </div>
+                            </Link>
+                            <div className="space-y-2">
+                              <div className="hover:underline underline-offset-4 font-medium">
+                                {getProductCategory(product) && (
+                                  <span className="text-gray-500 text-xs block">
+                                    {getProductCategory(product)}
+                                  </span>
+                                )}
+                                {product.title}
+                              </div>
+                              <div className="md:block hidden">
+                                {product.description}
+                              </div>
+                              <div className="flex flex-row gap-3 items-center">
+                                {product.originalPrice ? (
+                                  <span className="text-[#D12442] font-bold text-sm">
+                                    Rs.{product.price}
+                                  </span>
+                                ) : (
+                                  <span className="font-bold text-sm">
+                                    Rs.{product.price}
+                                  </span>
+                                )}
+                                {product.originalPrice && (
+                                  <div className="font-semibold text-sm line-through">
+                                    Rs.{product.originalPrice}
+                                  </div>
+                                )}
+                              </div>
+                              {product.isNew && (
+                                <div className="absolute top-1 sm:top-3 left-0 font-medium  text-[9px] sm:text-xs text-white bg-[#ffbb49]  sm:py-1 sm:px-2 px-1 py-0.5">
+                                  New In
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </InfiniteScroll>
+                ) : (
+                  <InfiniteScroll
+                    dataLength={products.length}
+                    next={loadMore}
+                    hasMore={hasMore}
+                    loader={
+                      products.length > 0 && totalCount !== null ? (
+                        <InfiniteScrollingtLoading
+                          progress={progress}
+                          loadedCount={products.length}
+                          totalCount={totalCount}
+                        />
+                      ) : (
+                        <div className="text-center py-4 text-gray-500">
+                          Loading products...
+                        </div>
+                      )
+                    }
+                    endMessage={
+                      <NoMoreProduct
+                        progress={progress}
+                        loadedCount={products.length}
+                        totalCount={totalCount ?? 0}
+                      />
+                    }
+                  >
+                    <div
+                      className={`grid ${getGridClass()} gap-5 pb-16 sm:gap-8`}
+                    >
+                      {sortedProducts.map((product, index) => (
+                        <div
+                          key={product._id || index}
+                          className="text-xs text-center relative space-y-3"
+                        >
+                          {product._id ? (
+                            <Link href={`/collection/${product._id}`}>
+                              {/* Product Image */}
                               {product.imageUrl ? (
-                                <Image
-                                  src={urlFor(product.imageUrl).url() || ""}
-                                  alt={product.title}
-                                  className="img-slider-img "
-                                  width={280}
-                                  height={280}
-                                />
+                                <div
+                                  className={`w-full h-80   xs:h-56 sm:h-80 
+                                ${gridCols == 2 ? "md:h-[450px]" : ""} bg-gray-100`}
+                                >
+                                  <Image
+                                    src={
+                                      urlFor(product.imageUrl).url() ||
+                                      "/im3.jpg"
+                                    }
+                                    alt={product.title}
+                                    width={500}
+                                    height={500}
+                                    // className="w-full max-h-full mx-auto my-auto object-cover"
+                                    className="img-slider-img"
+                                    onError={(e) => {
+                                      console.error(
+                                        "Image failed to load for product:",
+                                        product.title
+                                      );
+                                      e.currentTarget.src =
+                                        "https://images.unsplash.com/photo-1602524204986-6cfd29f63c41";
+                                    }}
+                                  />
+                                </div>
                               ) : (
-                                <div className="w-full flex justify-center items-center h-full bg-gray-200">
+                                <div
+                                  className={`w-full h-80   xs:h-56 sm:h-80 
+                                  ${gridCols == 2 ? "md:h-[450px]" : ""}  flex items-center justify-center bg-gray-200`}
+                                >
                                   <p className="text-gray-500 ">
                                     No image available
                                   </p>
                                 </div>
                               )}
-                            </div>
-                          </Link>
-                          <div className="space-y-2">
-                            <div className="hover:underline underline-offset-4 font-medium">
-                              {getProductCategory(product) && (
-                                <span className="text-gray-500 text-xs block">
-                                  {getProductCategory(product)}
-                                </span>
-                              )}
-                              {product.title}
-                            </div>
-                            <div className="md:block hidden">
-                              {product.description}
-                            </div>
-                            <div className="flex flex-row gap-3 items-center">
-                              {product.originalPrice ? (
-                                <span className="text-[#D12442] font-bold text-sm">
-                                  Rs.{product.price}
-                                </span>
-                              ) : (
-                                <span className="font-bold text-sm">
-                                  Rs.{product.price}
-                                </span>
-                              )}
-                              {product.originalPrice && (
-                                <div className="font-semibold text-sm line-through">
-                                  Rs.{product.originalPrice}
+
+                              {/* Product Title with Category from Tags */}
+                              <div className="hover:underline mt-2 underline-offset-4 text-gray-700 font-medium">
+                                {getProductCategory(product) && (
+                                  <span className="text-gray-500 text-xs block">
+                                    {getProductCategory(product)}
+                                  </span>
+                                )}
+                                {product.title}
+                              </div>
+
+                              {/* Product Price */}
+                              <div className="flex flex-col sm:flex-row sm:gap-3 items-center justify-center">
+                                {product.originalPrice ? (
+                                  <span className="text-[#D12442] font-bold text-sm">
+                                    Rs.{product.price}
+                                  </span>
+                                ) : (
+                                  <span className="font-bold text-sm">
+                                    Rs.{product.price}
+                                  </span>
+                                )}
+                                {product.originalPrice && (
+                                  <div className="font-semibold text-sm line-through">
+                                    Rs.{product.originalPrice}
+                                  </div>
+                                )}
+                              </div>
+
+                              {product.isNew && (
+                                <div className="absolute top-1 sm:top-3 left-0 font-medium text-[9px] sm:text-xs text-white bg-[#ffbb49] sm:py-1 sm:px-2 px-1 py-0.5">
+                                  New In
                                 </div>
                               )}
-                            </div>
-                            {product.isNew && (
-                              <div className="absolute top-1 sm:top-3 left-0 font-medium  text-[9px] sm:text-xs text-white bg-[#ffbb49]  sm:py-1 sm:px-2 px-1 py-0.5">
-                                New In
-                              </div>
-                            )}
-                          </div>
+                            </Link>
+                          ) : (
+                            <p className="text-red-500 text-center">
+                              Product unavailable
+                            </p>
+                          )}
                         </div>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div
-                    className={`grid ${getGridClass()} gap-5 pb-16 sm:gap-8`}
-                  >
-                    {sortedProducts.map((product, index) => (
-                      <div
-                        key={product._id || index}
-                        className="text-xs text-center relative space-y-3"
-                      >
-                        {product._id ? (
-                          <Link href={`/collection/${product._id}`}>
-                            {/* Product Image */}
-                            {product.imageUrl ? (
-                              <div
-                                className={`w-full h-80   xs:h-56 sm:h-80 
-                                ${gridCols == 2 ? "md:h-[450px]" : ""} bg-gray-100`}
-                              >
-                                <Image
-                                  src={
-                                    urlFor(product.imageUrl).url() || "/im3.jpg"
-                                  }
-                                  alt={product.title}
-                                  width={500}
-                                  height={500}
-                                  // className="w-full max-h-full mx-auto my-auto object-cover"
-                                  className="img-slider-img"
-                                  onError={(e) => {
-                                    console.error(
-                                      "Image failed to load for product:",
-                                      product.title
-                                    );
-                                    e.currentTarget.src =
-                                      "https://images.unsplash.com/photo-1602524204986-6cfd29f63c41";
-                                  }}
-                                />
-                              </div>
-                            ) : (
-                              <div
-                                className={`w-full h-80   xs:h-56 sm:h-80 
-                                  ${gridCols == 2 ? "md:h-[450px]" : ""}  flex items-center justify-center bg-gray-200`}
-                              >
-                                <p className="text-gray-500 ">
-                                  No image available
-                                </p>
-                              </div>
-                            )}
-
-                            {/* Product Title with Category from Tags */}
-                            <div className="hover:underline mt-2 underline-offset-4 text-gray-700 font-medium">
-                              {getProductCategory(product) && (
-                                <span className="text-gray-500 text-xs block">
-                                  {getProductCategory(product)}
-                                </span>
-                              )}
-                              {product.title}
-                            </div>
-
-                            {/* Product Price */}
-                            <div className="flex flex-col sm:flex-row sm:gap-3 items-center justify-center">
-                              {product.originalPrice ? (
-                                <span className="text-[#D12442] font-bold text-sm">
-                                  Rs.{product.price}
-                                </span>
-                              ) : (
-                                <span className="font-bold text-sm">
-                                  Rs.{product.price}
-                                </span>
-                              )}
-                              {product.originalPrice && (
-                                <div className="font-semibold text-sm line-through">
-                                  Rs.{product.originalPrice}
-                                </div>
-                              )}
-                            </div>
-
-                            {product.isNew && (
-                              <div className="absolute top-1 sm:top-3 left-0 font-medium text-[9px] sm:text-xs text-white bg-[#ffbb49] sm:py-1 sm:px-2 px-1 py-0.5">
-                                New In
-                              </div>
-                            )}
-                          </Link>
-                        ) : (
-                          <p className="text-red-500 text-center">
-                            Product unavailable
-                          </p>
-                        )}
-                      </div>
-                    ))}
-                  </div>
+                      ))}
+                    </div>
+                  </InfiniteScroll>
                 )}
               </>
             )}
@@ -897,19 +1159,21 @@ async  function min_max_price(){
                     type="checkbox"
                     id={`mobile-${category}`}
                     checked={selectedCategories.includes(category)}
-                    onChange={() => toggleCategory(category)}
+                    onChange={() => {
+                      setIsFilterOpen(false), toggleCategory(category);
+                    }}
                     className="h-4 w-4 rounded border-gray-300 accent-black"
                   />
                   <label htmlFor={`mobile-${category}`} className="text-sm">
                     {category}
-                    <span className="text-gray-400 ml-1">
+                    {/* <span className="text-gray-400 ml-1">
                       (
                       {
                         products.filter((p) => p.tags?.includes(category))
                           .length
                       }
                       )
-                    </span>
+                    </span> */}
                   </label>
                 </div>
               ))}
@@ -948,7 +1212,7 @@ async  function min_max_price(){
                 type="checkbox"
                 id="mobile-in-stock"
                 checked={inStockOnly}
-                onChange={() => setInStockOnly(!inStockOnly)}
+                onChange={handleStock}
                 className="h-4 w-4 rounded border-gray-300 accent-black"
               />
               <label htmlFor="mobile-in-stock" className="text-sm">
@@ -963,15 +1227,9 @@ async  function min_max_price(){
               onClick={() => {
                 clearFilters(), setIsFilterOpen(false);
               }}
-              className="flex-1 py-2 border border-gray-300 rounded"
-            >
-              Clear All
-            </button>
-            <button
-              onClick={() => setIsFilterOpen(false)}
               className="flex-1 py-2 bg-black text-white rounded hover:bg-gray-800"
             >
-              Apply Filters
+              Clear All
             </button>
           </div>
         </div>

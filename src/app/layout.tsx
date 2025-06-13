@@ -6,12 +6,8 @@ import Header from "./components/header";
 import Login from "./components/login";
 import Search from "./components/search";
 import Footer from "./components/footer";
-// import { AppProvider } from "@/context/ContextAPI"
-// import { CartProvider } from "@/app/components/cartContext";
 import { AppWrapper } from "@/context/ContextAPI"
 import { cookies } from "next/headers";
-import jwt from "jsonwebtoken"
-import NewsLetter from "./components/newsLetter";
 import ChatComponent from "./components/chatComponent";
 
 
@@ -29,8 +25,8 @@ const geistMono = Geist_Mono({
 const Mont = Montserrat({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Binsaeed – Fabric of Luxury | Premium Pret, Unstitched, Men, Women, Kids & Perfumes",
-  description: "Discover the essence of elegance with M Binsaeed’s Fabric of Luxury collection. Explore premium unstitched & pret suits, men’s formal wear, women’s dresses, kids’ fashion, and signature perfumes.",
+  title: "T Self – Fabric of Luxury | Premium Pret, Unstitched, Men, Women, Kids & Perfumes",
+  description: "Discover the essence of elegance with T Self’s Fabric of Luxury collection. Explore premium unstitched & pret suits, men’s formal wear, women’s dresses, kids’ fashion, and signature perfumes.",
 };
 
 export default async function RootLayout({

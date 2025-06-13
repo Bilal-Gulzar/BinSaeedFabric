@@ -83,12 +83,13 @@ const modalRef = useRef<HTMLDivElement | null>(null);
             </h2>
             <p>
               Your data or your credentials do not ever sell with the other
-              parties by us in any condition. At www.binsaeedfabric.com, we use
-              to gather as well as save the information of our customers in
-              order to improve your experience. The aim of this privacy policy
-              is to help you to understand the information which we collect
-              about you at the time you visit our website as well as how that
-              information is being used.
+              parties by us in any condition. At{" "}
+              {process.env.NEXT_PUBLIC_BASE_URL}, we use to gather as well as
+              save the information of our customers in order to improve your
+              experience. The aim of this privacy policy is to help you to
+              understand the information which we collect about you at the time
+              you visit our website as well as how that information is being
+              used.
             </p>
           </div>
           <div className="mb-5">
@@ -132,12 +133,12 @@ const modalRef = useRef<HTMLDivElement | null>(null);
             </h2>
             <p>
               Links for other sites may be available in our website for your
-              ease. The appearing links on www.binsaeedfabric.com must not
-              consider that we use to have any connection with the linked
-              websites. It is not the responsibility of www.binsaeedfabric.com
-              for the privacy activities or any content of these linked
-              websites. You must need to go through the privacy policies of
-              these linked websites.
+              ease. The appearing links on {process.env.NEXT_PUBLIC_BASE_URL}{" "}
+              must not consider that we use to have any connection with the
+              linked websites. It is not the responsibility of{" "}
+              {process.env.NEXT_PUBLIC_BASE_URL}, for the privacy activities or
+              any content of these linked websites. You must need to go through
+              the privacy policies of these linked websites.
             </p>
           </div>
           <div className="mb-5">
@@ -146,7 +147,7 @@ const modalRef = useRef<HTMLDivElement | null>(null);
             </h2>
             <p>
               You may contact us at{" "}
-              <span className="text-blue-500">info@binsaeedfabric.com </span>if
+              <span className="text-blue-500">tselffabric@gmail.com </span>if
               you have any problem or query regarding our privacy policy.
               <br />
               <br />

@@ -86,12 +86,18 @@ export default function Footer() {
           </div>
           <div className="lg:flex flex-col gap-2  mt-5 hidden  pb-10  duration-300">
             <span>
-              <Link href="/about" className="text-xs ">
+              <Link
+                href="/about"
+                className="text-xs  hover:underline underline-offset-2 hover:text-red-400 "
+              >
                 About US
               </Link>
             </span>
             <span>
-              <Link href="/contact" className="text-xs">
+              <Link
+                href="/contact"
+                className="text-xs  hover:underline underline-offset-2 hover:text-red-400"
+              >
                 Contact Us
               </Link>
             </span>
@@ -102,12 +108,18 @@ export default function Footer() {
             }    duration-300`}
           >
             <span>
-              <Link href="/about" className="text-xs ">
+              <Link
+                href="/about"
+                className="text-xs  hover:underline underline-offset-2 hover:text-red-400"
+              >
                 About US
               </Link>
             </span>
             <span>
-              <Link href="/contact" className="text-xs">
+              <Link
+                href="/contact"
+                className="text-xs  hover:underline underline-offset-2 hover:text-red-400"
+              >
                 Contact Us
               </Link>
             </span>
@@ -138,7 +150,7 @@ export default function Footer() {
             >
               Submit
             </Button>
-            <div className='z-20'>
+            <div className="z-20">
               <ReCAPTCHA
                 sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY!}
                 size="invisible"

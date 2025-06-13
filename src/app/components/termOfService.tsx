@@ -62,12 +62,13 @@ const modalRef = useRef<HTMLDivElement | null>(null);
         <div className=" overflow-y-auto max-h-[calc(75vh-40px)] pb-8 scrollbar-hide  mt-5 text-xs">
           <div className="mb-5">
             <p>
-              At Bin Saeed, we have a priority aim to enhance the experience of
-              our valuable customers. We at BIN SAEED guarantee the rights of
-              our customers and keep them aware at every instant by offering
-              advice through www.binsaeedfabric.com, social media, and catalog.
-              The below mentioned policy is for the same services and applicable
-              to all the placed orders within the country, on our online stores.
+              At T Self, we have a priority aim to enhance the experience of our
+              valuable customers. We at T SELF guarantee the rights of our
+              customers and keep them aware at every instant by offering advice
+              through {process.env.NEXT_PUBLIC_BASE_URL}, social media, and
+              catalog. The below mentioned policy is for the same services and
+              applicable to all the placed orders within the country, on our
+              online stores.
             </p>
           </div>
           <div className="mb-5">
@@ -142,15 +143,11 @@ const modalRef = useRef<HTMLDivElement | null>(null);
               Size Issue in our Product which is not up to provided Size Chart,
               that product can be exchanged. Contact our customer service center
               by emailing us images of defected product at
-              <span className="text-blue-500">
-                {" "}
-                sales@binsaeedfabric.com
-              </span>{" "}
-              or calling us at{" "}
-              <span className="text-blue-500"> +92-311-2900343</span> within 7
-              days of purchase along with the purchase invoice . Our team will
-              reviews the product, you will be offered an exchange with same
-              price value product.
+              <span className="text-blue-500"> tselffabric@gmail.com</span> or
+              calling us at <span className="text-blue-500"> +923278690391</span>{" "}
+              within 7 days of purchase along with the purchase invoice . Our
+              team will reviews the product, you will be offered an exchange
+              with same price value product.
             </p>
           </div>
           <div className="mb-5">
@@ -174,9 +171,9 @@ const modalRef = useRef<HTMLDivElement | null>(null);
               We do not entertain the refunds on gifts product if the delivery
               process is completed and the product is delivered. But if a person
               wish to return the product under this scenario, than he or she is
-              advised to contact the person who made purchase of BIN SAEED
-              product and then the original purchaser is needed to follow the
-              Exchange procedure within five (05) days time period.
+              advised to contact the person who made purchase of T SELF product
+              and then the original purchaser is needed to follow the Exchange
+              procedure within five (05) days time period.
             </p>
           </div>
           <div className="mb-5">

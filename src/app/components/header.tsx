@@ -22,8 +22,8 @@ export default function Header({token}:{token:string | undefined}) {
     <header
       className={`shadow-sm pb-1 lg:pb-0  ${noNavbarRoutes.includes(path) ? "hidden" : ""}`}
     >
-      <div className="bg-black font-medium text-white text-sm p-2.5">
-        <Marquee speed={50} gradient={false}>
+      <div className="bg-black font-Garamond font-semibold text-white text-sm p-2.5">
+        <Marquee speed={40} gradient={false}>
           Cash on Delivery limit is PKR 20,000 Orders above PKR 20,000 have to
           pay 50% advance Cash Deposit via Bank Transfer. | No Exchange or
           Return on Sale Items.
@@ -52,12 +52,37 @@ export default function Header({token}:{token:string | undefined}) {
         <div onClick={() => setSearch(true)} className="lg:hidden">
           <SearchIcon size={23} className="hover:scale-125 duration-300" />
         </div>
-        <nav className="text-xs font-bold lg:flex gap-6  hidden">
-          <Link href="/collection?category=Men">MEN</Link>
-          <Link href="/collection?category=Women">WOMEN</Link>
-          <Link href="/collection/?category=Kids">KIDS</Link>
-          <Link href="/collection?category=Perfume">PERFUME</Link>
-          <Link href="/collection">COLLECTION</Link>
+        <nav className="text-xs font-bold lg:flex gap-6   hidden">
+          <Link
+            href="/collection?category=Men"
+            className="hover:underline underline-offset-2"
+          >
+            MEN
+          </Link>
+          <Link
+            href="/collection?category=Women"
+            className="hover:underline underline-offset-2"
+          >
+            WOMEN
+          </Link>
+          <Link
+            href="/collection/?category=Kids"
+            className="hover:underline underline-offset-2"
+          >
+            KIDS
+          </Link>
+          <Link
+            href="/collection?category=Perfume"
+            className="hover:underline underline-offset-2"
+          >
+            PERFUME
+          </Link>
+          <Link
+            href="/collection"
+            className="hover:underline underline-offset-2"
+          >
+            COLLECTION
+          </Link>
         </nav>
         <div className="lg:flex hidden  gap-8 lg:gap-4 items-center">
           {token ? (
@@ -73,7 +98,10 @@ export default function Header({token}:{token:string | undefined}) {
             </div>
           )}
           <div onClick={() => setSearch(true)}>
-            <SearchIcon size={23} className="hover:scale-125 cursor-pointer duration-300" />
+            <SearchIcon
+              size={23}
+              className="hover:scale-125 cursor-pointer duration-300"
+            />
           </div>
           <div
             onClick={() => setCart(true)}
