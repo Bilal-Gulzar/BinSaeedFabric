@@ -138,21 +138,14 @@ export default function Footer() {
             >
               Submit
             </Button>
-            <ReCAPTCHA
-              sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY!}
-              size="invisible"
-              badge="bottomright"
-              ref={recaptchaRef}
-            />
-            {/* <ReCAPTCHA
-              ref={recaptchaRef}
-              sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY!}
-              size="invisible"
-              onErrored={() => console.warn("reCAPTCHA errored")}
-              onExpired={() => console.warn("reCAPTCHA expired")}
-              onLoad={() => console.log("reCAPTCHA loaded")}
-              // badge="inline"
-            /> */}
+            <div className='z-20'>
+              <ReCAPTCHA
+                sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY!}
+                size="invisible"
+                badge="bottomright"
+                ref={recaptchaRef}
+              />
+            </div>
           </form>
           <div className="flex gap-4 mt-7">
             <span className="bg-white size-9 flex rounded-full items-center justify-center">

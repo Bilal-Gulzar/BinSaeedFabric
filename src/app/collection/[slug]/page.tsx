@@ -123,6 +123,7 @@ export default function ProductPage() {
         id: product._id,
         name: product.title,
         price: product.price,
+        stock:product.qty,
         originalPrice: product.originalPrice,
         imageUrl: product.imageUrl,
         size: selectedSize ,

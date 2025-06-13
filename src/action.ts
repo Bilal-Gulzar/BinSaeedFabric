@@ -271,6 +271,19 @@ export async function checkOrderAvailability(orderId: string) {
   }
   
 
+export const CheckQuantity  = async(id:string)=>{
+
+  const productQuery = `*[_type == "product" && _id == $id][0]{
+    qty,
+  }`;
+
+  const Qty = await client.fetch(productQuery, { id });
+  if(!Qty) return 0
+  return Qty.qty
+
+
+}
+
 
   export async function subscribe(formData: FormData) {
     const email = formData.get("email")?.toString();

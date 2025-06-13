@@ -95,7 +95,7 @@ export default function NewsLetter() {
       <div
         data-aos="zoom-in"
         onClick={(e) => e.stopPropagation()}
-        className={`bg-white relative md:h-[500px] w-full xs:w-auto mx-10 sm:w-fit md:w-3xl lg:w-5xl md:grid grid-cols-2 transform transition-all duration-3000 ease-out ${popUp ? "" : "hidden"} `}
+        className={`bg-white relative md:h-[500px] w-full xs:w-auto mx-7 sm:mx-10 sm:w-fit md:w-3xl lg:w-5xl md:grid grid-cols-2 transform transition-all duration-3000 ease-out ${popUp ? "" : "hidden"} `}
         ref={modalRef}
       >
         <div className="h-[500px] md:flex hidden relative">
@@ -107,7 +107,7 @@ export default function NewsLetter() {
             Sign Up for exclusive updates, new arrivals & insider only
             discounts.
           </p>
-          <form ref={formRef} onSubmit={handleSubscriber} className="w-2xs ">
+          <form ref={formRef} onSubmit={handleSubscriber} className="w-full sm:w-2xs ">
             <div className="flex  w-full flex-col gap-3">
               <div className="">
                 <Input

@@ -237,13 +237,18 @@ export default function CartPage() {
                           </span>
                           <span
                             className="cursor-pointer text-gray-500 hover:text-black"
-                            onClick={() =>
+                            onClick={() =>{
+                              if(item.stock > item.quantity){
+
                               handleQuantityChange(
                                 item.id,
                                 item.quantity,
                                 1,
                                 item.size
                               )
+                            }
+                            }
+
                             }
                           >
                             <Plus size={20} />
@@ -287,13 +292,16 @@ export default function CartPage() {
                       </span>
                       <span
                         className="cursor-pointer  text-gray-500 hover:text-black"
-                        onClick={() =>
+                        onClick={() =>{
+                          if(item.stock > item.quantity){
                           handleQuantityChange(
                             item.id,
                             item.quantity,
                             1,
                             item.size
                           )
+                        }
+                        }
                         }
                       >
                         <Plus size={20} />

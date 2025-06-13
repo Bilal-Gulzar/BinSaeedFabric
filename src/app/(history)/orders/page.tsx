@@ -9,7 +9,7 @@ import { AiOutlineCheck } from 'react-icons/ai';
 import { IoAlertCircleOutline } from 'react-icons/io5';
 import { MdPayment } from 'react-icons/md';
 import { CgCloseO, CgSortAz } from "react-icons/cg";
-import { checkOrderAvailability, GetUserOrders } from '@/action';
+import { checkOrderAvailability, CheckQuantity, GetUserOrders } from '@/action';
 import { format, parseISO } from "date-fns";
 import { urlFor } from '@/sanity/lib/image';
 import { MdFilterList } from "react-icons/md";
@@ -113,15 +113,23 @@ const handleBuyAgain = async (orderId: string,items:Item[]) => {
   } else {
     clearCart()
     for (const product of items){
+      try{
+     const  Qty  = await CheckQuantity(product.id)
       for (let i = 0; i < product.quantity; i++) {
        addToCart({
       id: product.id,
       name: product.productName,
       price: product.price,
       imageUrl: product.imageUrl,
+      stock:Qty,
       size: product.size,
     }); 
   }
+}catch (error){
+  console.log("ERROR",error)
+  toast.error("somthing went wrong please try again")
+}
+
   }
     toast.success("All items added to cart");
      setTimeout(()=>{

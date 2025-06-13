@@ -14,6 +14,7 @@ interface CartItem {
   originalPrice?: number
   imageUrl: string
   quantity: number
+  stock:number
   size?: string
 }
 

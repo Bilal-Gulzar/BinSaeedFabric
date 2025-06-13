@@ -10,7 +10,7 @@ import { HiOutlineArrowLeft } from 'react-icons/hi';
 import { AiOutlineCheck } from 'react-icons/ai';
 import Svg from '@/app/components/Svg';
 import OrderPageFooter from '@/app/components/orderPageFooter';
-import { checkOrderAvailability, getorder } from '@/action';
+import { checkOrderAvailability, CheckQuantity, getorder } from '@/action';
 import { useParams, useRouter } from 'next/navigation';
 import { urlFor } from '@/sanity/lib/image';
 import { format, parseISO } from "date-fns";
@@ -121,14 +121,21 @@ const handleBuyAgain = async () => {
     clearCart();
     if (order && order?.items?.length > 0) {
       for (const product of order.items) {
-        for (let i = 0; i < product.quantity; i++) {
+         try{
+             const  Qty = await CheckQuantity(product.id)
+          for (let i = 0; i < product.quantity; i++) {
           addToCart({
             id: product.id,
             name: product.productName,
             price: product.price,
             imageUrl: product.imageUrl,
+            stock: Qty,
             size: product.size,
           });
+        }
+        }catch (error){
+          console.log("ERROR",error)
+          toast.error("somthing went wrong please try again")
         }
       }
       toast.success("All items added to cart");
