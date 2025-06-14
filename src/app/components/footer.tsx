@@ -170,11 +170,11 @@ export default function Footer() {
         </div>
       </section>
       <section className="bg-black text-xs text-gray-200 py-8 text-center px-4 flex justify-center items-center ">
-        Copyrights Hawk Sight Enterprises. All Rights Reserved.
+        Copyrights T Self Fabric. All Rights Reserved.
       </section>
-      <section className="bg-white py-1 text-[11px] ">
+      {/* <section className="bg-white py-1 text-[11px] ">
         .ProductItem__Label.ProductItem__Label--soldOut color: #000 !important;
-      </section>
+      </section> */}
       <NewsLetter />
     </footer>
   );

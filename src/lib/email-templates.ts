@@ -574,12 +574,12 @@ export function generateCustomerEmail(order:Product) {
             </center>
 
             <p style="text-align: center; color: #666; font-size: 14px; margin-top: 16px;">
-                Need help? Reply to this email or contact us at <a href="mailto:support@example.com" style="color: #000; font-weight: 500;">binsaeed@gmail.com</a>
+                Need help? Reply to this email or contact us at <a href="mailto:tselffabric@gmail.com" style="color: #000; font-weight: 500;">tselffabric@gmail.com</a>
             </p>
         </div>
-            <p><a href=${process.env.NEXT_PUBLIC_BASE_URL}>Binsaeed.com</a></p>
+            <p><a href=${process.env.NEXT_PUBLIC_BASE_URL}>T Self.com</a></p>
             <div class="footer-copyright">
-                © ${currentYear} BinSaeedFabric. All rights reserved.
+                © ${currentYear} T Self Fabric. All rights reserved.
             </div>
         </div>
     </div>
@@ -1132,12 +1132,12 @@ export function generateAdminEmail(order: Product) {
             </center>
 
             <p style="text-align: center; color: #666; font-size: 14px; margin-top: 16px;">
-                Need help? Reply to this email or contact us at <a href="mailto:support@example.com" style="color: #000; font-weight: 500;">binsaeed@gmail.com</a>
+                Need help? Reply to this email or contact us at <a href="mailto:tselffabric@gmail.com style="color: #000; font-weight: 500;">tselffabric@gmail.com</a>
             </p>
         </div>
-            <p><a href=${process.env.NEXT_PUBLIC_BASE_URL}>Binsaeed.com</a></p>
+            <p><a href=${process.env.NEXT_PUBLIC_BASE_URL}>T Self.com</a></p>
             <div class="footer-copyright">
-                © ${currentYear} BinSaeedFabric. All rights reserved.
+                © ${currentYear} T Self Fabric. All rights reserved.
             </div>
         </div>
     </div>
