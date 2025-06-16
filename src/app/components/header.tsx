@@ -20,7 +20,7 @@ export default function Header({token}:{token:string | undefined}) {
   const noNavbarRoutes = ["/logout", "/orders", "/profile", `/orders/${id}`,"/orderID"]
   return (
     <header
-      className={`shadow-sm pb-1 lg:pb-0  ${noNavbarRoutes.includes(path) ? "hidden" : ""}`}
+      className={`shadow-sm  z-10   ${noNavbarRoutes.includes(path) ? "hidden" : ""}`}
     >
       <div className="bg-black font-Garamond font-semibold text-white text-sm p-2.5">
         <Marquee speed={40} gradient={false}>

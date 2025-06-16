@@ -84,7 +84,7 @@ export default function SearchBarForMobile({
       {/* Search Input */}
       <form onSubmit={handleSearch} className="relative mt-9">
         <Input
-          placeholder="Search Products or Categories (Men, Women, Kids, Perfume)..."
+          placeholder="Search Products..."
           className="text-xs bg-gray-100 pr-10 border-0"
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}

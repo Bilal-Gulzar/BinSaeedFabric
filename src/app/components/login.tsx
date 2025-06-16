@@ -93,6 +93,7 @@ export default function Login() {
               id="email"
               placeholder="Email Address"
               required
+              className="!text-xs"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
             />
@@ -108,6 +109,7 @@ export default function Login() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="password"
+              className="!text-xs"
               type="password"
             />
           </div>
@@ -115,7 +117,7 @@ export default function Login() {
             <Button
               type="submit"
               disabled={disabled}
-              className="w-full font-bold"
+              className="w-full font-bold cursor-pointer"
             >
               LOG IN
             </Button>
@@ -128,7 +130,7 @@ export default function Login() {
               type="button"
               onClick={() => setLogin(false)}
               variant="outline"
-              className="w-full font-bold"
+              className="w-full cursor-pointer font-bold"
             >
               CREATE ACCOUNT
             </Button>

@@ -45,7 +45,7 @@ export default async function Home() {
       </div>
       <div
         style={{
-          minHeight: `calc(100vh - 200px)`,
+          minHeight: `calc(100vh - 250px)`, // berfore (100vh - 200px)
           maxWidth: "1500px",
           width: "100%",
           aspectRatio: "10/4",

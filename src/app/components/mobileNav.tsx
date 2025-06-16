@@ -24,7 +24,7 @@ export default function MobileNav({ token }: { token: string | undefined }) {
   }
   return (
     <section>
-      <div className="lg:hidden flex justify-around z-30 items-center w-screen left-0 right-0 bg-white fixed bottom-0  shadow-lg text-xs font-medium h-14">
+      <div className="lg:hidden shadow-top-md flex justify-around z-30 items-center w-screen left-0 right-0 bg-white fixed bottom-0  text-xs font-medium h-14">
         <div className="flex flex-col items-center *:text-xs cursor-pointer">
           <Link href="/">
             <House className="size-[22px]" />
@@ -45,10 +45,7 @@ export default function MobileNav({ token }: { token: string | undefined }) {
             <p>Collection</p>
           </div>
         </Link>
-        <div
-          onClick={account}
-          className="flex flex-col items-center"
-        >
+        <div onClick={account} className="flex flex-col items-center">
           <RiAccountCircleLine className="size-[22px]  " />
           <p className="cursor-pointer">Account</p>
         </div>

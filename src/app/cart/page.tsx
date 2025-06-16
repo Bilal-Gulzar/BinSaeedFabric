@@ -237,19 +237,16 @@ export default function CartPage() {
                           </span>
                           <span
                             className="cursor-pointer text-gray-500 hover:text-black"
-                            onClick={() =>{
-                              if(item.stock > item.quantity){
-
-                              handleQuantityChange(
-                                item.id,
-                                item.quantity,
-                                1,
-                                item.size
-                              )
-                            }
-                            }
-
-                            }
+                            onClick={() => {
+                              if (item.stock > item.quantity) {
+                                handleQuantityChange(
+                                  item.id,
+                                  item.quantity,
+                                  1,
+                                  item.size
+                                );
+                              }
+                            }}
                           >
                             <Plus size={20} />
                           </span>
@@ -292,17 +289,16 @@ export default function CartPage() {
                       </span>
                       <span
                         className="cursor-pointer  text-gray-500 hover:text-black"
-                        onClick={() =>{
-                          if(item.stock > item.quantity){
-                          handleQuantityChange(
-                            item.id,
-                            item.quantity,
-                            1,
-                            item.size
-                          )
-                        }
-                        }
-                        }
+                        onClick={() => {
+                          if (item.stock > item.quantity) {
+                            handleQuantityChange(
+                              item.id,
+                              item.quantity,
+                              1,
+                              item.size
+                            );
+                          }
+                        }}
                       >
                         <Plus size={20} />
                       </span>
@@ -394,6 +390,7 @@ export default function CartPage() {
                     name="name"
                     type="text"
                     id="name"
+                    className="!text-xs"
                   />
                 </div>
               </div>
@@ -405,7 +402,7 @@ export default function CartPage() {
                   <Input
                     required
                     disabled
-                    className="bg-gray-100 border border-black"
+                    className="bg-gray-100 border border-black !text-xs"
                     value={email}
                     name="email"
                     type="email"
@@ -431,6 +428,7 @@ export default function CartPage() {
                     name="phone"
                     type="number"
                     id="phone"
+                    className="!text-xs"
                   />
                 </div>
                 <p className="text-gray-500 mt-2 border-b border-gray-200 pb-4 ">
@@ -451,7 +449,7 @@ export default function CartPage() {
                       setForm((prev) => ({ ...prev, paymentMethod: value }))
                     }
                   >
-                    <SelectTrigger className="w-full !h-11">
+                    <SelectTrigger className="w-full !h-11 !text-xs">
                       <SelectValue placeholder="Select Payment Method" />
                     </SelectTrigger>
                     <SelectContent>
@@ -478,6 +476,7 @@ export default function CartPage() {
                     name="address"
                     type="text"
                     id="address"
+                    className="!text-xs"
                   />
                 </div>
               </div>
@@ -494,6 +493,7 @@ export default function CartPage() {
                     name="city"
                     type="text"
                     id="city"
+                    className="!text-xs"
                   />
                 </div>
               </div>
@@ -502,7 +502,7 @@ export default function CartPage() {
               <div className="pt-5 md:pt-28">
                 <Button
                   type="submit"
-                  className="hover:bg-white hover:text-black hover:border-gray-400 font-semibold hover:border w-full"
+                  className="hover:bg-white cursor-pointer hover:text-black hover:border-gray-400 font-semibold hover:border w-full"
                   disabled={cartItems.length === 0 || isLoading}
                 >
                   PROCEED TO CHECKOUT
@@ -514,7 +514,7 @@ export default function CartPage() {
                   type="button"
                   onClick={navigateToBack}
                   variant="outline"
-                  className="text-black w-full font-semibold"
+                  className="text-black cursor-pointer w-full font-semibold"
                 >
                   GO BACK TO PREVIOUS PAGE
                 </Button>

@@ -1,22 +1,25 @@
-"use client"
-import Link from "next/link"
-import { useState, useEffect, useRef } from "react"
-import { TfiLayoutColumn3Alt, TfiLayoutColumn2Alt, TfiLayoutColumn4Alt } from "react-icons/tfi"
-import { IoChevronDownOutline } from "react-icons/io5"
-import Image from "next/image"
-import { client } from "@/sanity/lib/client"
-import { urlFor } from "@/sanity/lib/image"
-import { clearAllBodyScrollLocks, disableBodyScroll, enableBodyScroll } from "body-scroll-lock";
-import { useRouter, useSearchParams } from "next/navigation"
+"use client";
+import Link from "next/link";
+import { useState, useEffect, useRef } from "react";
+import {
+  TfiLayoutColumn3Alt,
+  TfiLayoutColumn2Alt,
+  TfiLayoutColumn4Alt,
+} from "react-icons/tfi";
+import { IoChevronDownOutline } from "react-icons/io5";
+import Image from "next/image";
+import { client } from "@/sanity/lib/client";
+import { urlFor } from "@/sanity/lib/image";
+import { disableBodyScroll, enableBodyScroll } from "body-scroll-lock";
+import { useRouter, useSearchParams } from "next/navigation";
 import InfiniteScroll from "react-infinite-scroll-component";
-import useAppContext from "@/context/ContextAPI"
-import ProductGridSkeleton from "@/app/components/ProductGridSkeleton"
-import InfiniteScrollingtLoading from "../components/infiniteScrollingtLoading"
-import NoMoreProduct from "../components/NoMoreProduct"
-import { resolve } from "path"
+import useAppContext from "@/context/ContextAPI";
+import ProductGridSkeleton from "@/app/components/ProductGridSkeleton";
+import InfiniteScrollingtLoading from "../components/infiniteScrollingtLoading";
+import NoMoreProduct from "../components/NoMoreProduct";
 
-type GridSize = 1 | 2 | 3 | 4
- 
+type GridSize = 1 | 2 | 3 | 4;
+
 interface Product {
   _id: string;
   title: string;
@@ -54,8 +57,8 @@ export default function CollectionPage() {
   const [priceRange, setPriceRange] = useState<[number, number]>([1000, 5000]);
   const [inStockOnly, setInStockOnly] = useState(false);
   const [inset, setInset] = useState(false);
-  const [sortOption, setSortOption] = useState("dateN");
-  const [applySort, setApplySort] = useState("dateN");
+  const [sortOption, setSortOption] = useState("featured");
+  const [applySort, setApplySort] = useState("featured");
   // console.log(applySort,"applySort")
   // Products state
   const [products, setProducts] = useState<Product[]>([]);
@@ -67,7 +70,7 @@ export default function CollectionPage() {
     inStockOnly ||
     priceRange[0] !== minAllowed ||
     priceRange[1] !== maxAllowed;
-    
+
 
   const fetchProductCount = async () => {
     let filterQuery = "";
@@ -95,7 +98,6 @@ export default function CollectionPage() {
     const count = await client.fetch<number>(countQuery);
     setTotalCount(count);
   };
-  
 
   // Initialize filters from URL parameters
   useEffect(() => {
@@ -114,7 +116,11 @@ export default function CollectionPage() {
   }, [searchParams, setSearchCategories]);
 
   // Fetch filtered products paginated
-  const fetchPaginatedFilteredProducts = async (page: number, limit = 10) => {
+  const fetchPaginatedFilteredProducts = async (
+    page: number,
+    limit = 10,
+    sortOption = ""
+  ) => {
     const start = (page - 1) * limit;
     const end = start + limit;
 
@@ -134,8 +140,9 @@ export default function CollectionPage() {
     }
 
     const whereClause = filters.length ? ` && ${filters.join(" && ")}` : "";
+    const sortOrder = getSortOrder(sortOption);
 
-    const query = `*[_type == "product"${whereClause}] | order(_createdAt desc)[${start}...${end}] {
+    const query = `*[_type == "product"${whereClause}] | order(${sortOrder})[${start}...${end}] {
     title, price, tags[], _id, isNew, qty, originalPrice, description,
     "imageUrl": thumbnail.asset->url,
     productImages[] { asset->{ url } }
@@ -182,12 +189,16 @@ export default function CollectionPage() {
   //   fetchProducts()
   // }, [])
 
-  const fetchPaginatedProducts = async (page: number, limit: number = 10) => {
+  const fetchPaginatedProducts = async (
+    page: number,
+    limit: number = 10,
+    sortOption = ""
+  ) => {
     const start = (page - 1) * limit;
     const end = start + limit;
-
+    const sortOrder = getSortOrder(sortOption);
     return await client.fetch(
-      `*[_type == "product"] | order(_createdAt desc)[${start}...${end}] {
+      `*[_type == "product"] | order(${sortOrder})[${start}...${end}] {
         title, 
         price, 
         tags[], 
@@ -228,7 +239,6 @@ export default function CollectionPage() {
   //   }
   // };
 
-  
   // // Default paginated fetch (no filters)
   // const fetchPaginatedProducts = async (page: number, limit = 10) => {
   //   const start = (page - 1) * limit;
@@ -238,33 +248,37 @@ export default function CollectionPage() {
   //     "imageUrl": thumbnail.asset->url,
   //     productImages[] { asset->{ url } }
   //   }`;
-  
+
   //   return await client.fetch(query);
   // };
-  
+
   const loadMore = async () => {
     // if (!hasMore) return;
     await new Promise((resolve) => setTimeout(resolve, 800));
     try {
       const nextPage = page;
       let newProducts: Product[] = [];
-  
+
       if (filtersActive) {
-        newProducts = await fetchPaginatedFilteredProducts(nextPage);
+        newProducts = await fetchPaginatedFilteredProducts(
+          nextPage,
+          undefined,
+          sortOption
+        );
       } else {
-        newProducts = await fetchPaginatedProducts(nextPage);
+        newProducts = await fetchPaginatedProducts(nextPage, 10, sortOption);
         const newTags = newProducts.flatMap((p) => p.tags || []);
-            setTags((prevTags) => {
-              const combined = [...prevTags, ...newTags];
-              return [...new Set(combined)]; // unique tags only
-            });
+        setTags((prevTags) => {
+          const combined = [...prevTags, ...newTags];
+          return [...new Set(combined)]; // unique tags only
+        });
       }
-  
+
       if (newProducts.length === 0) {
         setHasMore(false);
       } else {
-        setProducts(prev => [...prev, ...newProducts]);
-        setPage(prev => prev + 1);
+        setProducts((prev) => [...prev, ...newProducts]);
+        setPage((prev) => prev + 1);
       }
     } catch (err) {
       console.error("Failed to load more products", err);
@@ -273,63 +287,71 @@ export default function CollectionPage() {
       setLoading(false);
     }
   };
-  
-async function AllowInset(){
-  setInset(true);
-  await new Promise((resolve) => setTimeout(resolve, 1000));
-  setInset(false);
-}
+
+  async function AllowInset() {
+    setInset(true);
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    setInset(false);
+  }
 
   // Reset products & page when filters change
-  useEffect(() => {
-    const fetchInitial = async () => {
-      setHasMore(true);
-      fetchProductCount()
 
-      setPage(1);
+  const fetchInitial = async () => {
+    setHasMore(true);
+    fetchProductCount();
 
-      try {
-        let initialProducts: Product[] = [];
+    setPage(1);
 
-        if (filtersActive) {
-          initialProducts = await fetchPaginatedFilteredProducts(1);
-        } else {
-          initialProducts = await fetchPaginatedProducts(1);
-        }
+    try {
+      let initialProducts: Product[] = [];
 
-        setProducts(initialProducts);
-        setPage(2);
-        setHasMore(initialProducts.length > 0);
-      } catch (err) {
-        console.error("Failed to fetch products", err);
-        setProducts([]);
-        setHasMore(false);
-      } finally {
-        setLoading(false);
+      if (filtersActive) {
+        initialProducts = await fetchPaginatedFilteredProducts(
+          1,
+          undefined,
+          sortOption
+        );
+      } else {
+        initialProducts = await fetchPaginatedProducts(
+          1,
+          undefined,
+          sortOption
+        );
       }
-    };
-  
-    fetchInitial();
-  }, [selectedCategories, priceRange, inStockOnly]);
-  
 
-  const progress = totalCount
-    ? Math.min((products.length / totalCount) * 100, 100)
-    : 0;
+      setProducts(initialProducts);
+      setPage(2);
+      setHasMore(initialProducts.length > 0);
+    } catch (err) {
+      console.error("Failed to fetch products", err);
+      setProducts([]);
+      setHasMore(false);
+    } finally {
+      await new Promise((r) => setTimeout(r, 2000));
+      setLoading(false);
+    }
+  };
+  useEffect(() => {
+   
+    fetchInitial();
+  }, [selectedCategories, priceRange, inStockOnly, sortOption]);
 
   useEffect(() => {
     const fetchInitial = async () => {
       try {
-        // Optional: min_max_price() call if you still need it
         min_max_price();
+        // setProducts([]);
         await fetchProductCount();
         // const tags = await client.fetch(`*[_type == "product"].tags[]`);
         // const uniqueTags = [...new Set(tags)] as string[];
         // setTags(uniqueTags);
+        const initialProducts: Product[] = await fetchPaginatedProducts(
+          1,
+          undefined,
+          sortOption
+        );
 
-        const initialProducts: Product[] = await fetchPaginatedProducts(1);
-        setProducts(initialProducts);
-
+        // setProducts(initialProducts);
         const initialTags: string[] = initialProducts.flatMap(
           (p) => p.tags || []
         );
@@ -337,16 +359,22 @@ async function AllowInset(){
         setTags(uniqueTags);
 
         setPage(2); // Next page
+
       } catch (err) {
         console.error("Error fetching products:", err);
         setError("Failed to load products");
       } finally {
+        await new Promise((r)=>setTimeout((r),1000))
         setLoading(false);
       }
     };
 
     fetchInitial();
   }, []);
+
+  const progress = totalCount
+    ? Math.min((products.length / totalCount) * 100, 100)
+    : 0;
 
   async function min_max_price() {
     const highest_Price = await client.fetch(
@@ -416,20 +444,39 @@ async function AllowInset(){
   // });
 
   // Sort products
-  const sortedProducts = [...products].sort((a, b) => {
+  // const sortedProducts = [...products].sort((a, b) => {
+  //   switch (sortOption) {
+  //     case "A-Z":
+  //       return a.title.localeCompare(b.title);
+  //     case "Z-A":
+  //       return b.title.localeCompare(a.title);
+  //     case "PriceL":
+  //       return a.price - b.price;
+  //     case "PriceH":
+  //       return b.price - a.price;
+  //     default:
+  //       return 0;
+  //   }
+  // });
+
+  const getSortOrder = (sortOption: string = "featured") => {
     switch (sortOption) {
       case "A-Z":
-        return a.title.localeCompare(b.title);
+        return "title asc";
       case "Z-A":
-        return b.title.localeCompare(a.title);
+        return "title desc";
       case "PriceL":
-        return a.price - b.price;
+        return "price asc";
       case "PriceH":
-        return b.price - a.price;
+        return "price desc";
+      case "dateO":
+        return "_createdAt asc";
+      case "dateN":
+      case "featured":
       default:
-        return 0;
+        return "_createdAt desc"; // Default to "new to old" or featured
     }
-  });
+  };
 
   // Grid class based on selected columns
   const getGridClass = () => {
@@ -449,7 +496,7 @@ async function AllowInset(){
 
   // Toggle category selection and update URL
   const toggleCategory = async (category: string) => {
-    await AllowInset()
+    await AllowInset();
     const newCategories = selectedCategories.includes(category)
       ? selectedCategories.filter((c) => c !== category)
       : [...selectedCategories, category];
@@ -479,17 +526,14 @@ async function AllowInset(){
     router.push("/collection", { scroll: false });
   };
 
+  const handleStock = async () => {
+    setIsFilterOpen(false);
+    setInset(true);
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    setInset(false);
 
-  const handleStock = async()=>{
-  setIsFilterOpen(false);
-  setInset(true)
-    await new Promise((resolve)=>setTimeout((resolve),1000))
-   setInset(false);
-
-    setInStockOnly(!inStockOnly)
-
-
-  }
+    setInStockOnly(!inStockOnly);
+  };
 
   // Show skeleton while loading
   if (loading) {
@@ -502,7 +546,7 @@ async function AllowInset(){
           <span>Collection</span>
         </div>
 
-        <div className="px-5 lg:px-12 mt-12 lg:grid lg:grid-cols-12 gap-6">
+        <div className="px-4 lg:px-12 mt-12 lg:grid lg:grid-cols-12 gap-6 mb-20">
           {/* Sidebar Skeleton - Desktop */}
           <div className="col-span-3 hidden lg:block">
             <div className="border-t border-gray-300 pt-6 space-y-6">
@@ -527,8 +571,16 @@ async function AllowInset(){
               <div className="h-6 w-16 bg-gray-300 animate-pulse rounded lg:hidden"></div>
               <div className="flex items-center gap-2">
                 <div className="h-6 w-20 bg-gray-300 animate-pulse rounded hidden lg:block"></div>
-                <div className="flex gap-1">
+                <div className="hidden lg:flex gap-1">
                   {Array.from({ length: 4 }).map((_, i) => (
+                    <div
+                      key={i}
+                      className="h-8 w-8 bg-gray-300 animate-pulse rounded border"
+                    ></div>
+                  ))}
+                </div>
+                <div className="flex lg:hidden gap-1">
+                  {Array.from({ length: 2 }).map((_, i) => (
                     <div
                       key={i}
                       className="h-8 w-8 bg-gray-300 animate-pulse rounded border"
@@ -790,7 +842,6 @@ async function AllowInset(){
                   className="border border-gray-300 rounded px-2 py-1"
                 >
                   <option value="featured">Featured</option>
-                  <option value="Best-selling">Best Selling</option>
                   <option value="A-Z">Alphabetically, A-Z</option>
                   <option value="Z-A">Alphabetically, Z-A</option>
                   <option value="PriceL">Price, low to high</option>
@@ -812,8 +863,8 @@ async function AllowInset(){
           </div>
 
           {/* Products Grid */}
-          <div className="p-4">
-            {sortedProducts.length === 0 ? (
+          <div className="py-4">
+            {products.length === 0 ? (
               <div className="flex flex-col items-center gap-5 py-14">
                 {/* <div className="text-xs text-gray-500">
                   Showing 0 of {products.length} products
@@ -879,7 +930,7 @@ async function AllowInset(){
                     }
                   >
                     <div className=" w-full mb-16">
-                      {sortedProducts.map((product) => (
+                      {products.map((product: Product) => (
                         <div
                           key={product._id}
                           className="space-y-5 border-b mb-10 border-gray-300"
@@ -972,9 +1023,9 @@ async function AllowInset(){
                     <div
                       className={`grid ${getGridClass()} gap-5 pb-16 sm:gap-8`}
                     >
-                      {sortedProducts.map((product, index) => (
+                      {products.map((product: Product, index: number) => (
                         <div
-                          key={product._id || index}
+                          key={index}
                           className="text-xs text-center relative space-y-3"
                         >
                           {product._id ? (
@@ -1198,7 +1249,7 @@ async function AllowInset(){
                 className="w-full accent-black"
               />
               <div className="flex justify-between text-sm mt-2">
-                {/* <span>Rs.{priceRange[0].toLocaleString()}</span> */}
+                <span>Rs.{priceRange[0].toLocaleString()}</span>
                 <span>Rs.{priceRange[1].toLocaleString()}</span>
               </div>
             </div>
@@ -1264,7 +1315,6 @@ async function AllowInset(){
             <div className="space-y-3">
               {[
                 { value: "featured", label: "Featured" },
-                { value: "Best-selling", label: "Best Selling" },
                 { value: "A-Z", label: "Alphabetically, A-Z" },
                 { value: "Z-A", label: "Alphabetically, Z-A" },
                 { value: "PriceL", label: "Price, low to high" },
@@ -1306,8 +1356,3 @@ async function AllowInset(){
     </div>
   );
 }
-
-
-
-
-

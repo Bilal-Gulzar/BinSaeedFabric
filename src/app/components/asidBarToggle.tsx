@@ -216,7 +216,7 @@ export default function AsidBarToggle({
                     />
                     <label htmlFor={`desktop-${category}`} className="text-sm">
                       {category}
-                      <span className="text-gray-400 ml-1">
+                      {/* <span className="text-gray-400 ml-1">
                         (
                         {
                           products.filter((p: Product) =>
@@ -224,7 +224,7 @@ export default function AsidBarToggle({
                           ).length
                         }
                         )
-                      </span>
+                      </span> */}
                     </label>
                   </div>
                 ))}

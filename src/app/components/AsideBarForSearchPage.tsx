@@ -196,7 +196,7 @@ export default function AsideBarForSearchPage({
                   />
                   <label htmlFor={`desktop-${category}`} className="text-sm">
                     {category}
-                    <span className="text-gray-400 ml-1">
+                    {/* <span className="text-gray-400 ml-1">
                       (
                       {
                         products.filter((p: Product) =>
@@ -204,7 +204,7 @@ export default function AsideBarForSearchPage({
                         ).length
                       }
                       )
-                    </span>
+                    </span> */}
                   </label>
                 </div>
               ))}

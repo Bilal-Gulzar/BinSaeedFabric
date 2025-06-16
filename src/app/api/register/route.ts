@@ -86,12 +86,13 @@ export async function POST(req: Request) {
     );
 
      response.cookies.set("authToken", token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV !== "development",
-      sameSite: "strict",
-      maxAge: 60 * 60 * 24 * 2,
-      path: "/",
-    });
+       httpOnly: true,
+       secure: process.env.NODE_ENV !== "development",
+       // sameSite: "strict",
+       sameSite: "lax",
+       maxAge: 60 * 60 * 24 * 2,
+       path: "/",
+     });
 
   
 

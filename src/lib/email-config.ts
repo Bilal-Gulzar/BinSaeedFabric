@@ -24,7 +24,7 @@ export async function sendEmail({
   bcc
 }: EmailOptions & { bcc?: string[] }) {
   await transporter.sendMail({
-    from: `"Bin Saaed Fabric" <${process.env.SMTP_USER}>`,
+    from: `"T self Fabric" <${process.env.SMTP_USER}>`,
     to,
     subject,
     html,

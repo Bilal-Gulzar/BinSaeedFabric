@@ -104,7 +104,6 @@ phone:formdata.get('phone') || '',
 email:formdata.get('email') || '',
 comment:formdata.get('comment') || ''
   })
-console.log(a)
  } 
 
 
@@ -364,7 +363,7 @@ export async function handleOrderConfirmation(orderID:string) {
 
   // Send to admin
   await sendEmail({
-    to: process.env.SMTP_USER!,
+    to:'undisclosed-recipients:;',
     subject: `New Order Received - ${new_Order._id}`,
     html: adminHtml,
     bcc: adminEmails,

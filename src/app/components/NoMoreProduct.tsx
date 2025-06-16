@@ -65,7 +65,7 @@ export default function NoMoreProduct({
 }) {
   return (
     <div className="flex my-20  flex-col items-center ">
-      <div className=" max-w-md min-w-1/4 flex flex-col items-center space-y-5 ">
+      <div className=" max-w-md min-w-1/3 flex flex-col items-center space-y-5 ">
         <div className="text-xs text-gray-600">
           {" "}
           Showing {loadedCount} of {totalCount} total

@@ -32,14 +32,14 @@ export default function Search() {
   const [results, setResults] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [allTags, setAllTags] = useState<string[]>([]);
- const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
- const [minPrice, setMinPrice] = useState(0);
- const [filteredResults, setFilteredResults] = useState<Product[]>([]); 
- const [maxPrice, setMaxPrice] = useState(0);
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [minPrice, setMinPrice] = useState(0);
+  const [filteredResults, setFilteredResults] = useState<Product[]>([]);
+  const [maxPrice, setMaxPrice] = useState(0);
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 0]);
   const categoryParam = searchParams.get("category") || "";
-  const [error, setError] = useState<string | null>(null)
-  
+  const [error, setError] = useState<string | null>(null);
+
   const categoryTags = categoryParam
     ? categoryParam.split(",").map((tag) => tag.trim())
     : [];
@@ -81,20 +81,73 @@ export default function Search() {
         setResults(data);
         setLoading(false);
         // Extract unique tags from data
-        const tags = data.flatMap((item: Product) => item.tags || []);
-        // const uniqueTags = Array.from(new Set(tags));
-        const uniqueTags = [...new Set(tags)] as string[];
-        setAllTags(uniqueTags);
-
-
+        // const tags = data.flatMap((item: Product) => item.tags || []);
+        // // const uniqueTags = Array.from(new Set(tags));
+        // const uniqueTags = [...new Set(tags)] as string[];
+        // setAllTags(uniqueTags);
       })
       .catch((error) => {
         console.error("Sanity fetch error:", error);
-        setError("Failed to load products")
+        setError("Failed to load products");
         setLoading(false);
         setAllTags([]);
       });
   }, [searchTerm, selectedCategories]);
+
+  // This useEffect runs only once on mount
+  const search = () => {
+    if (!searchTerm.trim() && categoryTags.length === 0) {
+      setResults([]);
+      setAllTags([]);
+      return;
+    }
+
+    const categoryFilter = categoryTags.length
+      ? `&& count((tags)[@ in $categories]) > 0`
+      : "";
+
+    const query = `*[_type == "product" && 
+    (title match $term || description match $term || tags[] match $term)
+    ${categoryFilter}
+  ]{
+    title,
+    price,
+    tags[],
+
+    _id,
+    isNew,
+    qty,
+    sizes[],
+    originalPrice,
+    description,
+    "imageUrl": thumbnail.asset->url,
+  }`;
+
+    client
+      .fetch(query, { term: `*${searchTerm}*`, categories: categoryTags })
+      .then((data) => {
+        setResults(data);
+        setLoading(false);
+
+        const tags = data.flatMap((item: Product) => item.tags || []);
+        const uniqueTags = [...new Set(tags)] as string[];
+        setAllTags(uniqueTags);
+      })
+      .catch((error) => {
+        console.error("Sanity fetch error:", error);
+        setError("Failed to load products");
+        setLoading(false);
+        setAllTags([]);
+      });
+  };
+
+  useEffect(() => {
+    search()
+  }, [])
+  useEffect(() => {
+    search();
+
+  }, [searchTerm]);
 
   useEffect(() => {
     if (results.length === 0) return;
@@ -114,10 +167,9 @@ export default function Search() {
           return [min, max];
         }
         return prev;
-      })
+      });
       // setResults(products);
       setFilteredResults(results);
-
     }
   }, [results]);
 
@@ -130,18 +182,16 @@ export default function Search() {
     );
     // console.log(priceRange)
     setFilteredResults(filtered);
-
   }, [priceRange, results]);
 
-
-//  Show skeleton while loading
+  //  Show skeleton while loading
   if (loading) {
     return (
       <div className="max-w-[1500px] mx-auto min-h-screen">
-        <div className="px-5 lg:px-12 mt-12 lg:grid lg:grid-cols-12 gap-6">
+        <div className="px-4 lg:px-12 mt-12 lg:grid lg:grid-cols-12 gap-6">
           {/* Sidebar Skeleton - Desktop */}
           <div className="col-span-3 hidden lg:block">
-            <div className="b pt-6 space-y-6">
+            <div className=" pt-6 space-y-6">
               <div className="h-6 w-24 bg-gray-300 animate-pulse rounded"></div>
               <div className="space-y-4">
                 <div className="h-4 w-20 bg-gray-300 animate-pulse rounded"></div>
@@ -163,16 +213,8 @@ export default function Search() {
               <div className="h-6 w-16 bg-gray-300 animate-pulse rounded lg:hidden"></div>
               <div className="flex items-center gap-2">
                 <div className="h-6 w-20 bg-gray-300 animate-pulse rounded hidden lg:block"></div>
-                <div className="flex gap-1">
-                  {Array.from({ length: 4 }).map((_, i) => (
-                    <div
-                      key={i}
-                      className="h-8 w-8 bg-gray-300 animate-pulse rounded border"
-                    ></div>
-                  ))}
-                </div>
               </div>
-              <div className="h-6 w-24 bg-gray-300 animate-pulse rounded"></div>
+              {/* <div className="h-6 w-24 bg-gray-300 animate-pulse rounded"></div> */}
             </div>
 
             {/* Products Grid Skeleton */}
@@ -183,7 +225,7 @@ export default function Search() {
     );
   }
 
-  if (error) return <div className="p-8 text-center text-red-500">{error}</div>
+  if (error) return <div className="p-8 text-center text-red-500">{error}</div>;
 
   return (
     <div>
@@ -219,7 +261,7 @@ export default function Search() {
                 {searchTerm && results.length > 0 && (
                   <div
                     onClick={() => setToggle(true)}
-                    className="lg:hidden flex items-center mt-7  gap-1"
+                    className="lg:hidden w-fit border border-black p-1 flex items-center mt-7 gap-1"
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -238,7 +280,7 @@ export default function Search() {
                   </div>
                 )}
                 <div
-                  className={`grid grid-cols-1 xs:grid-cols-2  pb-20 lg:grid-cols-3 mt-10 gap-5 sm:gap-7 md:gap-10`}
+                  className={`grid grid-cols-1 xs:grid-cols-2  pb-20 lg:grid-cols-3  2xl:grid-cols-4 mt-10 gap-5 sm:gap-7 md:gap-10`}
                   style={{ width: "100%", height: "100%" }}
                 >
                   {filteredResults &&
@@ -248,14 +290,13 @@ export default function Search() {
                         className="text-xs text-center relative  mb-3 space-y-1.5"
                       >
                         <Link href={`/collection/${item._id}`}>
-                          <div className="bg-gray-100">
+                          <div className="bg-gray-100 w-full relative 	aspect-[4/5] overflow-hidden">
                             {item.imageUrl ? (
                               <Image
                                 src={item.imageUrl}
                                 alt={item.title}
-                                width={400}
-                                height={400}
-                                className="img-slider-img "
+                                fill
+                                className="object-cover"
                               />
                             ) : (
                               <div className="flex justify-center items-center h-full w-full  bg-gray-200">

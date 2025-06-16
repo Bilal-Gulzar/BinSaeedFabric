@@ -51,7 +51,7 @@ export default function ProductPage() {
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        console.log("Fetching product with slug:", productSlug);
+        // console.log("Fetching product with slug:", productSlug);
         const query = `*[_type == "product" && _id == $id][0]{
           title, 
           price, 

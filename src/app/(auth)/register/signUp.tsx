@@ -51,7 +51,7 @@ export default function SignUp({token}:{token:string}) {
   }, []);
 
   return (
-    <div className="px-12 py-8">
+    <div className="px-5 sm:px-12 py-8">
       <section className="flex flex-col gap-5">
         <div className="text-xs  space-x-2 text-gray-800">
           <Link href={"/"}>Home</Link>
@@ -74,6 +74,7 @@ export default function SignUp({token}:{token:string}) {
             value={fname}
             disabled={disabled}
             required
+            className="!text-xs"
             onChange={(e) => setFname(e.target.value)}
           />
         </div>
@@ -83,6 +84,7 @@ export default function SignUp({token}:{token:string}) {
             id="lname"
             value={lname}
             disabled={disabled}
+            className="!text-xs"
             required
             onChange={(e) => setLname(e.target.value)}
           />
@@ -97,6 +99,7 @@ export default function SignUp({token}:{token:string}) {
             required
             disabled={disabled}
             value={email}
+            className="!text-xs"
             onChange={(e) => setEmail(e.target.value)}
           />
         </div>
@@ -109,6 +112,7 @@ export default function SignUp({token}:{token:string}) {
             value={password}
             required
             disabled={disabled}
+            className="!text-xs"
             onChange={(e) => setPassword(e.target.value)}
           />
         </div>
