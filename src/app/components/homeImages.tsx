@@ -14,7 +14,7 @@ interface Image{
 export default function HomeImages({imageUrl}:{imageUrl:Image[]}) {
 
   return (
-      <section className="flex overflow-x-auto gap-8 scrollbar-hide mb-10" >
+      <section className="flex overflow-x-auto gap-8 scrollbar-hide mb-4 md:mb-10" >
         {imageUrl.map((k:Image) => (
           <div
             key={k._id}

@@ -64,7 +64,7 @@ export default async function Home() {
             <h2 className="uppercase text-xl font-semibold border-t border-black text-center pt-6 pb-3">
               latest in
             </h2>
-            <div className="mb-20">
+            <div className="mb-10 md:mb-20">
               <div id="new-in">
                 <LatestIn />
               </div>

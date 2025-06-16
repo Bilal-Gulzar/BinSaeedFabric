@@ -270,7 +270,7 @@ export default function CollectionPage() {
         const newTags = newProducts.flatMap((p) => p.tags || []);
         setTags((prevTags) => {
           const combined = [...prevTags, ...newTags];
-          return [...new Set(combined)]; // unique tags only
+          return [...new Set(combined)]; 
         });
       }
 
@@ -294,45 +294,49 @@ export default function CollectionPage() {
     setInset(false);
   }
 
-  // Reset products & page when filters change
 
-  const fetchInitial = async () => {
-    setHasMore(true);
-    fetchProductCount();
-
-    setPage(1);
-
-    try {
-      let initialProducts: Product[] = [];
-
-      if (filtersActive) {
-        initialProducts = await fetchPaginatedFilteredProducts(
-          1,
-          undefined,
-          sortOption
-        );
-      } else {
-        initialProducts = await fetchPaginatedProducts(
-          1,
-          undefined,
-          sortOption
-        );
-      }
-
-      setProducts(initialProducts);
-      setPage(2);
-      setHasMore(initialProducts.length > 0);
-    } catch (err) {
-      console.error("Failed to fetch products", err);
-      setProducts([]);
-      setHasMore(false);
-    } finally {
-      await new Promise((r) => setTimeout(r, 2000));
-      setLoading(false);
-    }
-  };
+ 
   useEffect(() => {
-   
+    // Reset products & page when filters change
+    const fetchInitial = async () => {
+      setHasMore(true);
+      fetchProductCount();
+
+      setPage(1);
+
+      try {
+        let initialProducts: Product[] = [];
+
+        if (filtersActive) {
+          initialProducts = await fetchPaginatedFilteredProducts(
+            1,
+            undefined,
+            sortOption
+          );
+          setTags((prevTags) => {
+            const combined = [...prevTags, ...selectedCategories];
+            return [...new Set(combined)]; // unique tags only
+          });
+        } else {
+          initialProducts = await fetchPaginatedProducts(
+            1,
+            undefined,
+            sortOption
+          );
+        }
+
+        setProducts(initialProducts);
+        setPage(2);
+        setHasMore(initialProducts.length > 0);
+      } catch (err) {
+        console.error("Failed to fetch products", err);
+        setProducts([]);
+        setHasMore(false);
+      } finally {
+        await new Promise((r) => setTimeout(r, 2000));
+        setLoading(false);
+      }
+    };
     fetchInitial();
   }, [selectedCategories, priceRange, inStockOnly, sortOption]);
 
