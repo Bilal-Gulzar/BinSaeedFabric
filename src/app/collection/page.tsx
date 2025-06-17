@@ -368,7 +368,7 @@ export default function CollectionPage() {
         console.error("Error fetching products:", err);
         setError("Failed to load products");
       } finally {
-        await new Promise((r)=>setTimeout((r),2000))
+        await new Promise((r)=>setTimeout((r),1000))
         setLoading(false);
       }
     };
