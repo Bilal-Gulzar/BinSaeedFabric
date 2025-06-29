@@ -20,31 +20,53 @@ export async function POST(req: Request) {
       );
     }
 
-    const url = `https://emailvalidation.abstractapi.com/v1/?api_key=${process.env.ABSTRACT_API_KEY}&email=${encodeURIComponent(email)}`;
+    const options = {
+      method: "GET",
+      headers: {
+        "x-rapidapi-host": "real-time-email-validation.p.rapidapi.com",
+        "x-rapidapi-key": process.env.INFOGENIE_API_KEY || "",
+      },
+    };
+    // const url = `https://emailvalidation.abstractapi.com/v1/?api_key=${process.env.ABSTRACT_API_KEY}&email=${encodeURIComponent(email)}`;
 
-    const res = await fetch(url);
+    const url = `https://real-time-email-validation.p.rapidapi.com/validate_email?email=${encodeURIComponent(email)}`;
+    const res = await fetch(url, options);
     const data = await res.json();
+    // console.log("Email validation response:", data);
 
-    if (!data.is_valid_format.value) {
+    if (data.error) {
+      console.error("Email validation API error:", data.error.message);
+      return NextResponse.json(
+        {
+          message: "Email validation failed",
+          success: false,
+        },
+        { status: 500 }
+      );
+    }
+    if (!data.format_valid) {
       return NextResponse.json(
         { message: "Invalid email format", success: false },
         { status: 200 }
       );
     }
-    if (!data.is_mx_found.value) {
+    if (!data.domain_exists || !data.mx_record_exists) {
       return NextResponse.json(
-      { message: "Email domain not found", success: false },
-      { status: 400 })
+        { message: "Email domain not found", success: false },
+        { status: 400 }
+      );
     }
-    if (data.is_disposable_email.value) {
+    if (data.is_temporary) {
       return NextResponse.json(
-      { message: "Disposable emails are not allowed", success: false },
-        { status: 400 })
+        { message: "Disposable emails are not allowed", success: false },
+        { status: 400 }
+      );
     }
-    if (!data.is_smtp_valid.value) {
+    if (!data.smtp_check) {
       return NextResponse.json(
-      { message: "Email address does not exist", success: false },
-      { status: 400 })
+        { message: "Email address does not exist", success: false },
+        { status: 400 }
+      );
     }
 
     if (password.length < 8) {

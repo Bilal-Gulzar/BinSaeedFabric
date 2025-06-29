@@ -236,11 +236,17 @@ export default function ProductPage() {
                       fill
                       alt={`${product.title} ${index + 1}`}
                       sizes="100px"
-                      className="object-cover"
+                      className={`object-cover  ${
+                        selectedImageIndex === index ? "rounded-md" : ""
+                      }`}
                       onClick={() => setMainImage(urlFor(image).url())}
                     />
                     {selectedImageIndex == index && (
-                      <div className="absolute inset-0 border-0 bg-white/60"></div>
+                      <div
+                        className={`absolute inset-0 border-0  ${
+                          selectedImageIndex === index ? "rounded-md" : ""
+                        } bg-white/60`}
+                      ></div>
                     )}
                   </div>
                 ))}
@@ -368,8 +374,8 @@ export default function ProductPage() {
                   </span>
                   <span
                     className="cursor-pointer text-gray-700 hover:text-black"
-                    onClick={() =>{ 
-                      if (product.qty > quantity){
+                    onClick={() => {
+                      if (product.qty > quantity) {
                         handleQuantityChange(1);
                       }
                     }}
