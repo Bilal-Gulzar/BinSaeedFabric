@@ -50,8 +50,8 @@ export default function Login() {
          toast.success("Your are login successfully!");
          setTimeout(() => {
            setLogin(false);
-           router.push("/orders");
            router.refresh()
+           router.push("/orders");
            setEmail("");
            setPassword("");
            

@@ -30,8 +30,8 @@ export default function SignUp({token}:{token:string}) {
       if (result.success) {
         toast.success("Your account created successfully!");
         setTimeout(() => {
-          router.push("/orders");
           router.refresh()
+          router.push("/orders");
         }, 1500);
       } else {
         toast.error(result.message);
